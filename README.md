@@ -1,1 +1,1 @@
-# TSPs
+# Ternoa Standards Proposals (TSPs)
