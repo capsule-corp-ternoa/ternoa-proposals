@@ -1,4 +1,4 @@
-# Basic NFT Specifications
+# Basic NFT Technical Specifications
 
 ## Title
 PSP Number: TSP-721
