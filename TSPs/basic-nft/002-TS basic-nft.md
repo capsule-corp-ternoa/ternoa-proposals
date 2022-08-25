@@ -49,6 +49,9 @@ burn_nft
 transfer_nft
 set_nft_mint_fee
 
+### Getters
+
+
 ### Extensions
 
 #### Delegation
