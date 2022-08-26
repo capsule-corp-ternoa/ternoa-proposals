@@ -26,13 +26,18 @@ The motivation should describe what motivated the development of the standard as
       {
         "name": "origin",
         "type": "OriginFor<T>",
-        "description": ""
+        "description": "",
+        "constraints": [
+          "The caller needs to be of signed origin."
+        ]
       },
       {
         "name": "offchain_data",
         "type": "U8BoundedVec<NFTOffchainDataLimit>",
         "description": "Content or Path to NFT metadata. This can be an IPFS reference, link to a custom web location or just plain text.",
-        "limit": "Max 150 Bytes",
+        "constraints": [
+          "The length cannot be longer than NFTOffchainDataLimit limit."
+        ],
         "examples": [
           "QmUcXT3zVGtvpoeFXun32BGGUtWTyuQi1C3obBpbMVjncU",
           "https://cdn.pixabay.com/photo/2018/12/17/07/43/labrador-3879893_960_720.jpg",
@@ -42,12 +47,18 @@ The motivation should describe what motivated the development of the standard as
       {
         "name": "royalty",
         "type": "Permill",
-        "description": "The cut that the creator will receive on every secondary sale. 0% is 0 and 100% is 1000000."
+        "description": "The cut that the creator will receive on every secondary sale. 0% is 0 and 100% is 1000000.",
+        "constraints": [
+          "Minimum is 0 and Maximum is 1000000."
+        ]
       },
       {
         "name": "collection_id",
         "type": "Option<CollectionId>",
-        "description": "If provided, the NFT will be associated with the provided Collection ID."
+        "description": "If provided, the NFT will be associated with the provided Collection ID.",
+        "constraints": [
+          "If provided, the collection needs to be owned by the caller."
+        ]
       },
       {
         "name": "is_soulbound",
@@ -117,12 +128,18 @@ The motivation should describe what motivated the development of the standard as
       {
         "name": "origin",
         "type": "OriginFor<T>",
-        "description": ""
+        "description": "",
+        "constraints": [
+          "The caller needs to be of signed origin."
+        ]
       },
       {
         "name": "nft_id",
         "type": "NFTId",
-        "description": "ID of the NFT that needs to be removed from storage."
+        "description": "ID of the NFT that needs to be removed from storage.",
+        "constraints": [
+          "The caller needs to be the owner of the NFT."
+        ]
       }
     ],
     "events": [
@@ -157,12 +174,18 @@ The motivation should describe what motivated the development of the standard as
       {
         "name": "origin",
         "type": "OriginFor<T>",
-        "description": ""
+        "description": "",
+        "constraints": [
+          "The caller needs to be of signed origin."
+        ]
       },
       {
         "name": "nft_id",
         "type": "NFTId",
-        "description": "ID of the NFT that needs to be transferred."
+        "description": "ID of the NFT that needs to be transferred.",
+        "constraints": [
+          "The caller needs to be the owner of the NFT."
+        ]
       }
     ],
     "events": [
@@ -207,7 +230,10 @@ The motivation should describe what motivated the development of the standard as
       {
         "name": "origin",
         "type": "OriginFor<T>",
-        "description": ""
+        "description": "",
+        "constraints": [
+          "The caller needs to be of root origin."
+        ]
       },
       {
         "name": "fee",

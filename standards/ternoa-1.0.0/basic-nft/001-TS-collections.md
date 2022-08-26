@@ -27,13 +27,17 @@ The motivation should describe what motivated the development of the standard as
         "name": "origin",
         "type": "OriginFor<T>",
         "description": "",
-        "constraints": "The caller needs to be of signed origin."
+        "constraints": [
+          "The caller needs to be of signed origin."
+        ]
       },
       {
         "name": "offchain_data",
         "type": "U8BoundedVec<CollectionOffchainDataLimit>",
         "description": "Content or Path to collection metadata. This can be an IPFS reference, link to a custom web location or just plain text.",
-        "constraints": "The length cannot be longer than CollectionOffchainDataLimit limit.",
+        "constraints": [
+          "The length cannot be longer than CollectionOffchainDataLimit limit."
+        ],
         "examples": [
           "QmUcXT3zVGtvpoeFXun32BGGUtWTyuQi1C3obBpbMVjncU",
           "https://cdn.pixabay.com/photo/2018/12/17/07/43/labrador-3879893_960_720.jpg",
@@ -89,13 +93,17 @@ The motivation should describe what motivated the development of the standard as
         "name": "origin",
         "type": "OriginFor<T>",
         "description": "",
-        "constraints": "The caller needs to be of signed origin."
+        "constraints": [
+          "The caller needs to be of signed origin."
+        ]
       },
       {
         "name": "collection_id",
         "type": "CollectionId",
         "description": "ID of the collection that needs to be removed from storage.",
-        "constraints": "The caller needs to be the owner of the collection."
+        "constraints": [
+          "The caller needs to be the owner of the collection."
+        ]
       }
     ],
     "events": [
@@ -127,13 +135,17 @@ The motivation should describe what motivated the development of the standard as
         "name": "origin",
         "type": "OriginFor<T>",
         "description": "",
-        "constraints": "The caller needs to be of signed origin."
+        "constraints": [
+          "The caller needs to be of signed origin."
+        ]
       },
       {
         "name": "collection_id",
         "type": "CollectionId",
         "description": "The ID of the collection that needs to be closed.",
-        "constraints": "The caller needs to be the owner of the collection."
+        "constraints": [
+          "The caller needs to be the owner of the collection."
+        ]
       }
     ],
     "events": [
@@ -164,19 +176,25 @@ The motivation should describe what motivated the development of the standard as
         "name": "origin",
         "type": "OriginFor<T>",
         "description": "",
-        "constraints": "The caller needs to be of signed origin."
+        "constraints": [
+          "The caller needs to be of signed origin."
+        ]
       },
       {
         "name": "collection_id",
         "type": "CollectionId",
         "description": "The ID of the collection that needs to be closed.",
-        "constraints": "The caller needs to be the owner of the collection."
+        "constraints": [
+          "The caller needs to be the owner of the collection."
+        ]
       },
       {
         "name": "limit",
         "type": "u32",
         "description": "The maximum amount of NFTs that can be associated with a collection.",
-        "constraints": "The limit value needs to be bigger or equal to the existing mount of NFTs in the collection. The value cannot be more than the CollectionSizeLimit limit."
+        "constraints": [
+          "The limit value needs to be bigger or equal to the existing mount of NFTs in the collection. The value cannot be more than the CollectionSizeLimit limit."
+        ]
       }
     ],
     "events": [
@@ -216,19 +234,28 @@ The motivation should describe what motivated the development of the standard as
         "name": "origin",
         "type": "OriginFor<T>",
         "description": "",
-        "constraints": "The caller needs to be of signed origin."
+        "constraints": [
+          "The caller needs to be of signed origin."
+        ]
       },
       {
         "name": "nft_id",
         "type": "NFTId",
         "description": "The ID of the NFT that needs to associated with a collection.",
-        "constraints": "The caller needs to be the owner of the NFT."
+        "constraints": [
+          "The caller needs to be the owner of the NFT.",
+          "The NFT needs to be not associated with any collection."
+        ]
       },
       {
         "name": "collection_id",
         "type": "CollectionID",
         "description": "The ID of the collection that needs to associated with an NFT.",
-        "constraints": "The caller needs to be the owner of the collection."
+        "constraints": [
+          "The caller needs to be the owner of the collection.",
+          "The collection cannot be closed",
+          "The collection needs to have less NFT associated with it than the maximum limit."
+        ]
       }
     ],
     "events": [
@@ -257,7 +284,7 @@ The motivation should describe what motivated the development of the standard as
       "nft::NFTNotFound",
       "nft::NotTheNFTOwner",
       "nft::NFTBelongToACollection",
-      "nft::CannotAddMoreNFTsToCollection",
+      "nft::CannotAddMoreNFTsToCollection"
     ]
   }
 ]
