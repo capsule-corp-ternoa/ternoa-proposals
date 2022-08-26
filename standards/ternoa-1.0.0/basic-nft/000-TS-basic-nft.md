@@ -1,7 +1,7 @@
 # Basic NFT Technical Specifications
 
 ## Title
-PSP Number: TSP-721
+TSP Number: TSP-000
 Authors: @markopoloparadox, @peshwar9
 Status: Call for Feedback
 Created: 2022-08-25
@@ -16,7 +16,7 @@ The motivation should describe what motivated the development of the standard as
 ## Specification
 ### Interfaces:
 create_nft
-```sh
+```json
 {
   "name": "create_nft",
   "parametrs": [

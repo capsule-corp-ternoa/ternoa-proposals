@@ -5,3 +5,7 @@ The Ternoa 1.0.0 Standard includes the following modules:
 - [NFT Marketplaces](./marketplace/README.md)
 - [NFT Auctions](./auction/README.md)
 - [NFT Renting](./rental/README.md)
+
+
+Non-NFT related modules:
+- [CAPS Token Bridge](./bridge/README.md)
