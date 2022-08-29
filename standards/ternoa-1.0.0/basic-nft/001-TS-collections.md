@@ -2,7 +2,7 @@
 
 ## Title
 TSP Number: TSP-001
-Authors: @markopoloparadox, @peshwar9
+Authors: @markopoloparadox, @peshwar9, @ipapandinas
 Status: Call for Feedback
 Created: 2022-08-25
 Reference Implementation [Link to a first reference implementation]
@@ -14,7 +14,7 @@ A summary of the standard and the addressed issue. TODO
 The motivation should describe what motivated the development of the standard as well as why particular decisions were made. TODO
 
 ## Specification
-### Blockcahin Extrinsic Interfaces:
+### Blockchain Extrinsic Interfaces:
 ```json
 [
   {
@@ -290,4 +290,212 @@ The motivation should describe what motivated the development of the standard as
 ]
 ```
 
-### SDK Storage Getters
+### SDK
+
+> #### [Events](#events)
+> #### [Extrinsics helpers](#extrinsics-helpers)
+> #### [Storage getters](#storage-getters)
+> #### [Constants getters](#constants-getters)
+
+#### Events
+
+```typescript
+import { Event } from "@polkadot/types/interfaces/system";
+
+export declare enum EventType {
+    CollectionCreated = "nft.CollectionCreated",
+    CollectionLimited = "nft.CollectionLimited",
+    CollectionClosed = "nft.CollectionClosed",
+    CollectionBurned = "nft.CollectionBurned",
+}
+export declare class BlockchainEvent {
+    type: EventType;
+    raw: Event;
+    section: string;
+    method: string;
+    constructor(raw: Event, type: EventType);
+    static fromEvent(event: Event): BlockchainEvent;
+}
+
+/**
+ * This class represents the on-chain CollectionCreatedEvent event.
+ */
+export declare class CollectionCreatedEvent extends BlockchainEvent {
+    collectionId: number;
+    owner: string;
+    offchainData: string;
+    limit: number | null;
+    /**
+     * Construct the data object from the CollectionCreatedEvent event
+     * @param event The CollectionCreatedEvent event
+     */
+    constructor(event: Event);
+}
+/**
+ * This class represents the on-chain blockchain CollectionLimitedEvent event.
+ */
+export declare class CollectionLimitedEvent extends BlockchainEvent {
+    collectionId: number;
+    limit: number;
+    /**
+     * Construct the data object from the CollectionLimitedEvent event
+     * @param event The CollectionLimitedEvent event
+     */
+    constructor(event: Event);
+}
+/**
+ * This class represents the on-chain CollectionClosedEvent event.
+ */
+export declare class CollectionClosedEvent extends BlockchainEvent {
+    collectionId: number;
+    /**
+     * Construct the data object from theCollectionClosedEvent event
+     * @param event The CollectionClosedEvent event
+     */
+    constructor(event: Event);
+}
+/**
+ * This class represents the on-chain CollectionBurnedEvent event.
+ */
+export declare class CollectionBurnedEvent extends BlockchainEvent {
+    collectionId: number;
+    /**
+     * Construct the data object from the CollectionBurnedEvent event
+     * @param event The CollectionBurnedEvent event
+     */
+    constructor(event: Event);
+}
+```
+
+#### Extrinsics helpers
+
+```typescript
+import { IKeyringPair } from "@polkadot/types/types";
+
+export declare type TransactionHashType = `0x${string}`;
+export declare enum WaitUntil {
+  BlockInclusion = 0,
+  BlockFinalization = 1
+}
+
+/**
+ * @name createCollectionTx
+ * @summary               Creates an unsigned unsubmitted Create-Collection Transaction Hash.
+ * @param offchainData    Off-chain related Collection metadata. Can be an IPFS Hash, an URL or plain text.
+ * @param limit           The maximum amount that NFTs that the collection can hold. This is optional
+ * @returns               Unsigned unsubmitted Create-Collection Transaction Hash. The Hash is only valid for 5 minutes.
+ */
+export declare const createCollectionTx: (offchainData: string, limit?: number | undefined) => Promise<TransactionHashType>;
+
+/**
+ * @name createCollection
+ * @summary               Creates a collection.
+ * @param offchainData    Off-chain related Collection metadata. Can be an IPFS Hash, an URL or plain text.
+ * @param limit           Amount of NFTs that can be associated with this collection. This is optional
+ * @param keyring         Account that will sign the transaction.
+ * @param waitUntil       Execution trigger that can be set either to BlockInclusion or BlockFinalization.
+ * @returns               CollectionCreatedEvent Blockchain event.
+ */
+export declare const createCollection: (offchainData: string, limit: number | undefined, keyring: IKeyringPair, waitUntil: WaitUntil) => Promise<CollectionCreatedEvent>;
+
+/**
+ * @name limitCollectionTx
+ * @summary       Creates an unsigned unsubmitted Limit-Collection Transaction Hash.
+ * @param id      The ID of the Collection.
+ * @param limit   Amount of NFTs that can be associated with this collection.
+ * @returns       Unsigned unsubmitted Limit-Collection Transaction Hash. The Hash is only valid for 5 minutes.
+ */
+export declare const limitCollectionTx: (id: number, limit: number) => Promise<TransactionHashType>;
+
+/**
+ * @name limitCollection
+ * @summary           Limits how many NFTs can be associated with this collection.
+ * @param id          The ID of the Collection.
+ * @param limit       Amount of NFTs that can be associated with this collection.
+ * @param keyring     Account that will sign the transaction.
+ * @param waitUntil   Execution trigger that can be set either to BlockInclusion or BlockFinalization.
+ * @returns           CollectionLimitedEvent Blockchain event.
+ */
+export declare const limitCollection: (id: number, limit: number, keyring: IKeyringPair, waitUntil: WaitUntil) => Promise<CollectionLimitedEvent>;
+
+/**
+ * @name closeCollectionTx
+ * @summary   Creates an unsigned unsubmitted Close-Collection Transaction Hash.
+ * @param id  The ID of the Collection.
+ * @returns   Unsigned unsubmitted Close-Collection Transaction Hash. The Hash is only valid for 5 minutes.
+ */
+export declare const closeCollectionTx: (id: number) => Promise<TransactionHashType>;
+
+/**
+ * @name closeCollection
+ * @summary           Closes the collection so that no new NFTs can be added.
+ * @param id          The ID of the Collection.
+ * @param keyring     Account that will sign the transaction.
+ * @param waitUntil   Execution trigger that can be set either to BlockInclusion or BlockFinalization.
+ * @returns           CollectionClosedEvent Blockchain event.
+ */
+export declare const closeCollection: (id: number, keyring: IKeyringPair, waitUntil: WaitUntil) => Promise<CollectionClosedEvent>;
+
+/**
+ * @name burnCollectionTx
+ * @summary   Creates an unsigned unsubmitted Burn-Collection Transaction Hash.
+ * @param id  The ID of the Collection.
+ * @returns   Unsigned unsubmitted Burn-Collection Transaction Hash. The Hash is only valid for 5 minutes.
+ */
+export declare const burnCollectionTx: (id: number) => Promise<TransactionHashType>;
+
+/**
+ * @name burnCollection
+ * @summary           Burns an existing collection. The collections needs to be empty before it can be burned.
+ * @param id          The ID of the Collection.
+ * @param keyring     Account that will sign the transaction.
+ * @param waitUntil   Execution trigger that can be set either to BlockInclusion or BlockFinalization.
+ * @returns           CollectionBurnedEvent Blockchain event.
+ */
+export declare const burnCollection: (id: number, keyring: IKeyringPair, waitUntil: WaitUntil) => Promise<CollectionBurnedEvent>;
+
+```
+
+#### Storage getters
+
+```typescript
+export interface ICollectionData {
+  owner: string;
+  offchainData: string;
+  nfts: number[];
+  limit: number;
+  isClosed: boolean;
+}
+
+/**
+ * @name getNextCollectionId
+ * @summary Get the next collection Id available.
+ * @returns Number.
+ */
+export declare const getNextCollectionId: () => Promise<number>;
+
+/**
+ * @name getCollectionData
+ * @summary             Provides the data related to one NFT collection. ex:{owner, creator, offchainData, limit, isClosed(...)}
+ * @param collectionId  The collection id.
+ * @returns             A JSON object with data of a single NFT collection.
+ */
+export declare const getCollectionData: (collectionId: number) => Promise<ICollectionData | null>;
+```
+
+#### Constants getters
+
+```typescript
+/**
+ * @name getCollectionSizeLimit
+ * @summary Maximum collection length.
+ * @returns Number.
+ */
+export declare const getCollectionSizeLimit: () => Promise<number>;
+/**
+ * @name getCollectionOffchainDataLimit
+ * @summary Provides the maximum offchain data length.
+ * @returns Number.
+ */
+export declare const getCollectionOffchainDataLimit: () => Promise<number>;
+```
