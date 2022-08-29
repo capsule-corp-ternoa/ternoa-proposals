@@ -74,4 +74,68 @@ The motivation should describe what motivated the development of the standard as
 ]
 ```
 
-### SDK Storage Getters
+### SDK
+
+> #### [Events](#events)
+> #### [Extrinsics helpers](#extrinsics-helpers)
+
+#### Events
+
+```typescript
+import { Event } from "@polkadot/types/interfaces/system";
+export declare enum EventType {
+    NFTDelegated = "nft.NFTDelegated",
+}
+export declare class BlockchainEvent {
+    type: EventType;
+    raw: Event;
+    section: string;
+    method: string;
+    constructor(raw: Event, type: EventType);
+    static fromEvent(event: Event): BlockchainEvent;
+}
+
+/**
+ * This class represents the on-chain NFTDelegatedEvent event.
+ */
+export declare class NFTDelegatedEvent extends BlockchainEvent {
+    nftId: number;
+    recipient: string | null;
+    /**
+     * Construct the data object from the NFTDelegatedEvent event
+     * @param event The NFTDelegatedEvent event
+     */
+    constructor(event: Event);
+}
+```
+
+#### Extrinsics helpers
+
+```typescript
+import { IKeyringPair } from "@polkadot/types/types";
+
+export declare type TransactionHashType = `0x${string}`;
+export declare enum WaitUntil {
+  BlockInclusion = 0,
+  BlockFinalization = 1,
+}
+
+/**
+ * @name delegateNftTx
+ * @summary           Creates an unsigned unsubmitted Delegate-NFT Transaction Hash.
+ * @param id          The ID of the NFT.
+ * @param recipient   Destination account. If set to undefined this functions acts as a way to undelegate a delegated NFT.
+ * @returns           Unsigned unsubmitted Delegate-NFT Transaction Hash. The Hash is only valid for 5 minutes.
+ */
+export declare const delegateNftTx: (id: number, recipient?: string | undefined) => Promise<TransactionHashType>;
+/**
+ * @name delegateNft
+ * @summary           Delegates an NFT to someone.
+ * @param id          The ID of the NFT.
+ * @param recipient   Destination account. If set to undefined this functions acts as a way to undelegate a delegated NFT.
+ * @param keyring     Account that will sign the transaction.
+ * @param waitUntil   Execution trigger that can be set either to BlockInclusion or BlockFinalization.
+ * @returns           NFTDelegatedEvent Blockchain event.
+ */
+export declare const delegateNft: (id: number, recipient: string | undefined, keyring: IKeyringPair, waitUntil: WaitUntil) => Promise<NFTDelegatedEvent>;
+```
