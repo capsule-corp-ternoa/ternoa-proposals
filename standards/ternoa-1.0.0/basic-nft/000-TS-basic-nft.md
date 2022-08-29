@@ -2,7 +2,7 @@
 
 ## Title
 TSP Number: TSP-000
-Authors: @markopoloparadox, @peshwar9
+Authors: @markopoloparadox, @peshwar9, @ipapandinas
 Status: Call for Feedback
 Created: 2022-08-25
 Reference Implementation [Link to a first reference implementation]
@@ -261,4 +261,259 @@ The motivation should describe what motivated the development of the standard as
 ]
 ```
 
-### SDK Storage Getters
+### SDK
+
+> #### [Events](#events)
+> #### [Extrinsics helpers](#extrinsics-helpers)
+> #### [Storage getters](#storage-getters)
+> #### [Constants getters](#constants-getters)
+
+#### Events
+
+```typescript
+import { Event } from "@polkadot/types/interfaces/system";
+export declare enum EventType {
+    NFTCreated = "nft.NFTCreated",
+    NFTBurned = "nft.NFTBurned",
+    NFTTransferred = "nft.NFTTransferred",
+    NFTAddedToCollection = "nft.NFTAddedToCollection",
+}
+export declare class BlockchainEvent {
+    type: EventType;
+    raw: Event;
+    section: string;
+    method: string;
+    constructor(raw: Event, type: EventType);
+    static fromEvent(event: Event): BlockchainEvent;
+}
+
+/**
+ * This class represents the on-chain NFTCreatedEvent event.
+ */
+export declare class NFTCreatedEvent extends BlockchainEvent {
+    nftId: number;
+    owner: string;
+    offchainData: string;
+    royalty: number;
+    collectionId: number | null;
+    isSoulbound: boolean;
+    mintFee: string;
+    mintFeeRounded: number;
+    /**
+     * Construct the data object from the NFTCreatedEvent event
+     * @param event The NFTCreatedEvent event
+     */
+    constructor(event: Event);
+}
+/**
+ * This class represents the on-chain NFTBurnedEvent event.
+ */
+export declare class NFTBurnedEvent extends BlockchainEvent {
+    nftId: number;
+    /**
+     * Construct the data object from the NFTBurnedEvent event
+     * @param event The NFTBurnedEvent event
+     */
+    constructor(event: Event);
+}
+/**
+ * This class represents the on-chain NFTTransferredEvent event.
+ */
+export declare class NFTTransferredEvent extends BlockchainEvent {
+    nftId: number;
+    sender: string;
+    recipient: string;
+    /**
+     * Construct the data object from the NFTTransferredEvent event
+     * @param event The NFTTransferredEvent event
+     */
+    constructor(event: Event);
+}
+/**
+ * This class represents the on-chain NFTAddedToCollectionEvent event.
+ */
+export declare class NFTAddedToCollectionEvent extends BlockchainEvent {
+    nftId: number;
+    collectionId: number;
+    /**
+     * Construct the data object from the NFTAddedToCollectionEvent event
+     * @param event The NFTAddedToCollectionEvent event
+     */
+    constructor(event: Event);
+}
+```
+
+#### Extrinsics helpers
+
+```typescript
+import { IKeyringPair } from "@polkadot/types/types";
+
+export declare type TransactionHashType = `0x${string}`;
+export declare enum WaitUntil {
+  BlockInclusion = 0,
+  BlockFinalization = 1,
+}
+
+/**
+ * @name createNftTx
+ * @summary             Creates an unsigned unsubmitted Create-NFT Transaction Hash.
+ * @param offchainData  Off-chain related NFT metadata. Can be an IPFS Hash, an URL or plain text.
+ * @param royalty       Percentage of all second sales that the creator will receive. It's a decimal number in range [0, 100]. Default is 0.
+ * @param collectionId  The collection that this NFT will belong. Optional Parameter.
+ * @param isSoulbound   If true makes the NFT untransferable. Default is false.
+ * @returns             Unsigned unsubmitted Create-NFT Transaction Hash. The Hash is only valid for 5 minutes.
+ */
+export declare const createNftTx: (
+  offchainData: string,
+  royalty?: number,
+  collectionId?: number | undefined,
+  isSoulbound?: boolean
+) => Promise<TransactionHashType>;
+/**
+ * @name createNft
+ * @summary             Creates an NFT on the chain.
+ * @param offchainData  Off-chain related NFT metadata. Can be an IPFS Hash, an URL or plain text.
+ * @param royalty       Percentage of all second sales that the creator will receive. It's a decimal number in range [0, 100]. Default is 0.
+ * @param collectionId  The collection that this NFT will belong. Optional Parameter.
+ * @param isSoulbound   If true makes the NFT untransferable. Default is false.
+ * @param keyring       Account that will sign the transaction.
+ * @param waitUntil     Execution trigger that can be set either to BlockInclusion or BlockFinalization.
+ * @returns             NFTCreatedEvent Blockchain event.
+ */
+export declare const createNft: (
+  offchainData: string,
+  royalty: number | undefined,
+  collectionId: number | undefined,
+  isSoulbound: boolean | undefined,
+  keyring: IKeyringPair,
+  waitUntil: WaitUntil
+) => Promise<NFTCreatedEvent>;
+/**
+ * @name burnNftTx
+ * @summary   Creates an unsigned unsubmitted Burn-NFT Transaction Hash.
+ * @param id  The ID of the NFT.
+ * @returns   Unsigned unsubmitted Burn-NFT Transaction Hash. The Hash is only valid for 5 minutes.
+ */
+export declare const burnNftTx: (id: number) => Promise<TransactionHashType>;
+/**
+ * @name burnNft
+ * @summary           Burns an NFT from the chain.
+ * @param id          The ID of the NFT.
+ * @param keyring     Account that will sign the transaction.
+ * @param waitUntil   Execution trigger that can be set either to BlockInclusion or BlockFinalization.
+ * @returns           NFTBurnedEvent Blockchain event.
+ */
+export declare const burnNft: (
+  id: number,
+  keyring: IKeyringPair,
+  waitUntil: WaitUntil
+) => Promise<NFTBurnedEvent>;
+/**
+ * @name transferNftTx
+ * @summary           Creates an unsigned unsubmitted Transfer-NFT Transaction Hash.
+ * @param id          The ID of the NFT.
+ * @param recipient   Destination account.
+ * @returns           Unsigned unsubmitted Transfer-NFT Transaction Hash. The Hash is only valid for 5 minutes
+ */
+export declare const transferNftTx: (
+  id: number,
+  recipient: string
+) => Promise<TransactionHashType>;
+/**
+ * @name transferNft
+ * @summary           Sends an NFT to someone.
+ * @param id          The ID of the NFT.
+ * @param recipient   Destination account.
+ * @param keyring     Account that will sign the transaction.
+ * @param waitUntil   Execution trigger that can be set either to BlockInclusion or BlockFinalization.
+ * @returns           NFTTransferredEvent Blockchain event.
+ */
+export declare const transferNft: (
+  id: number,
+  recipient: string,
+  keyring: IKeyringPair,
+  waitUntil: WaitUntil
+) => Promise<NFTTransferredEvent>;
+/**
+ * @name addNftToCollectionTx
+ * @summary               Creates an unsigned unsubmitted Add-NFT-To-Collection Transaction Hash.
+ * @param nft_id          The ID of the NFT.
+ * @param collection_id   The ID of the Collection.
+ * @returns               Unsigned unsubmitted Add-NFT-To-Collection Transaction Hash. The Hash is only valid for 5 minutes.
+ */
+export declare const addNftToCollectionTx: (
+  nft_id: number,
+  collection_id: number
+) => Promise<TransactionHashType>;
+/**
+ * @name addNftToCollection
+ * @summary               Adds an NFT to an existing collection.
+ * @param nft_id          The ID of the NFT.
+ * @param collection_id   The ID of the Collection.
+ * @param keyring         Account that will sign the transaction.
+ * @param waitUntil       Execution trigger that can be set either to BlockInclusion or BlockFinalization.
+ * @returns               NFTAddedToCollectionEvent Blockchain event.
+ */
+export declare const addNftToCollection: (
+  nft_id: number,
+  collection_id: number,
+  keyring: IKeyringPair,
+  waitUntil: WaitUntil
+) => Promise<NFTAddedToCollectionEvent>;
+```
+
+#### Storage getters
+
+```typescript
+import BN from "bn.js";
+export declare type BalanceType = BN;
+
+export declare type INftData = {
+  owner: string;
+  creator: string;
+  offchainData: string;
+  collectionId: number | undefined;
+  royalty: number;
+  state: INftState;
+};
+
+/**
+ * @name nftMintFee
+ * @summary Fee to mint an NFT (extra fee on top of the tx fees).
+ * @returns NFT mint fee.
+ */
+export declare const getNftMintFee: () => Promise<BalanceType>;
+/**
+ * @name getNextNftId
+ * @summary Get the next NFT Id available.
+ * @returns Number.
+ */
+export declare const getNextNftId: () => Promise<number>;
+/**
+ * @name getNftData
+ * @summary       Provides the data related to one NFT.
+ * @param nftId   The NFT id.
+ * @returns       A JSON object with the NFT data. ex:{owner, creator, offchainData, (...)}
+ */
+export declare const getNftData: (nftId: number) => Promise<INftData | null>;
+```
+
+#### Constants getters
+
+```typescript
+import BN from "bn.js";
+export declare type BalanceType = BN;
+
+/**
+ * @name getInitialMintFee
+ * @summary Original mint fee.
+ * @returns Original NFT mint fee.
+ */
+export declare const getInitialMintFee: () => Promise<BalanceType>;
+/**
+ * @name getNftOffchainDataLimit
+ * @summary Provides the maximum offchain data length.
+ * @returns Number.
+ */
+export declare const getNftOffchainDataLimit: () => Promise<number>;
+```
