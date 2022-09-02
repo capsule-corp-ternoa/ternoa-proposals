@@ -12,7 +12,7 @@ Reference Implementation [Link to a first reference implementation]
 NFT Renting allows user to put their NFTs for rent. Rent can be used for any digital asset. A rent contract has multiple parameters defining the terms of the lease. (Duration, subscription, cancellation fee, ...).
 
 ## Motivation
-This pallet is implement to give more flexbility to Ternoa's NFTs. It can replace all types of subscription and simple renting.
+This pallet is implemented to give more flexbility to Ternoa's NFTs. It can replace all types of subscription and simple renting.
 
 ## Specification
 ### Blockchain Type Interfaces
