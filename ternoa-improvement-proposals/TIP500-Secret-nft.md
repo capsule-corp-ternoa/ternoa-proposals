@@ -23,19 +23,61 @@ Secret NFTs require the generation , exchange and storage of cryptographic keys 
 
 While the blockchain as a public ledger of transactions provides irrefutable proof of ownership of NFTs, it does not meet the privacy of data needed for many NFT use cases. Secret NFTs have been designed by Ternoa with this in mind. Examples of private data that can be stored in NFTs include private images or videos, limited edition audio releases by music artists, private documents with long-term storage such as legal deed containing inheritance details and confidential company details.
 
-## Specification
+## Specification - Onchain
+
+### Secret NFT onchain lifecycle states
+Secret NFTs will have the following lifecycle associated with them:
+Pending Mint -> Minted -> Pending Burn -> Burned.
+
+Secret NFT should support the following onchain interfaces:
 ```
 interface {
-  // User can convert a Basic NFT into a Secret NFT
+
+  /// Interface Id: TIP500-01
+  /// Description: User can convert a Basic NFT into a Secret NFT
+  /// Constraint(s): 
+  ///       - The Basic NFT should not be listed in a marketplace or delegated at the time of conversion to Secret NFT
+  ///       - The Secret NFT when minted should initially be set to 'Pending Mint' State. Only when all the secret shares associated with the NFT have been stored in the enclaves, should the Secret NFT move to 'Minted' state.
+  
   ConvertBasicToSecretNFT(cid ipfs_hash, uint256 nft_id );
   
+  /// Interface Id: TIP500-02
+  /// Description: User can directly mint a Secret NFT
+  /// Constraint(s): 
+  ///       - The Secret NFT when minted should initially be set to 'Pending Mint' State. Only when all the secret shares associated with the NFT have been stored in the enclaves, should the Secret NFT move to 'Minted' state.
+
   MintSecretNFT(cid offchain_uri, uint256 royalty, u32 collection_id?, bool is_soulbound);
+
+  /// Interface Id: TIP500-04
+  /// Description: This interface would be used to burn a secret NFT.
+  /// Constraint(s):
+  ///     - When Secret NFT is burned, its status should be set to 'Pending Burn'. Burning of secret NFT would be done only when all the secret shares associated with the NFT have been deleted from the enclaves.
+
+  BurnSecretNFT(uint256 nft_id)
+
+  /// Interface Id: TIP500-03
+  /// Description: This interface is called by each of the TEE enclaves to confirm receipt of secret share for a given NFT. When all enclaves from a cluster confirm receipt of threshold shares, the secret NFT status goes to 'Minted', after which it can be transferred or listed on marketplace. This is a private interface available only for the enclaves to use
+  /// Constraint(s): 
+  ///       - Only enclaves can use this interface. Not to be used by dApps or users.
+  ///       - When all the secret shares associated with a secret NFT have been confirmed to be received, then the NFT state should be changed from 'Pending Mint' to 'Minted'
   
-  // Private interface for TEE enclaves to use
-  /// When all enclaves from a cluster confirm receipt of threshold shares, the secret NFT status goes to 'Minted' 
-  UpdateNFTStatus(uint256 nft_id, uint32 enclave_id)
+  SecretShareReceivedForNFT(uint256 nft_id, uint32 enclave_id)
+
+  /// Interface Id: TIP500-04
+  /// Description: This interface is called by each of the TEE enclaves when the secret share associated with a secret NFT has been deleted by the wallet/dApp. This is a private interface available only for the enclaves to use
+  /// Constraint(s): 
+  ///       - Only enclaves can use this interface. Not to be used by dApps or users.
+  ///       - When all the secret shares for an NFT have been confirmed to be deleted, the Secret NFT can be burned. Verify that the NFT is in 'Pending Burn' State before the burn is performed.  
+  
+  SecretShareDeletedForNFT(uint256 nft_id, uint32 enclave_id)
+
 }
+
+Additionally Secret NFTs should support the following interfaces which are already implemented in Basic NFT (so, no additional work is expected to support these interfaces):
+1. Transfer a secret NFT from one wallet to another
+2. List/Buy/Sell a secret NFT on a marketplace
 ```
+
 ## Additional Info
 
 While the primary use case of Secret NFTs is to provide the ability to securely store encryption keys in TEE enclave, there can be many uses of this feature beyond encrypting NFT media. The key management and TEE enclaves system can be used to securely store any kind of data.
@@ -60,7 +102,7 @@ The format for the offchain metadata of Secret NFT is suggested here:
 ```
 This metadata of secret NFT will be stored on IPFs, and it’s content Id (CID) will be stored onchain.
 
-## Offchain component
+## Specification - Offchain
 
 One of the primary challenges to be solved in implementing secret NFTs is the secure storage and retrieval of the encryption keys associated with each Secret NFT. The architecture proposed involves storage and retrieval of keys in a trusted execution environment (TEE) which is an offchain component associated with the secret NFT solution. TEE programs running on processors such as SGX provide strong trust guarantees in terms of data privacy and verification of the programs running within them. This can be achieved through techniques such as remote attestation that gives assurance that the program running inside the enclave is running on genuine TEE hardware (such as SGX), and the programs have not been modified by the TEE node operators. Data storage on TEEs are also secured by sealing them with the secure keys associated with the TEE hardware and/or author of the TEE programs.
 
