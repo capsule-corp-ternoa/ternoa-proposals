@@ -3,7 +3,7 @@
 | Author(s)      | Mohsin Riaz, Amin Razavi, Prabhu Eshwarla |
 | ----------- | ----------- |
 | Created   | 7 Sep 2022       |
-| TIP Number   | TIP500       |
+| TIP Number   | TIP501       |
 | Version   | v0.1       |
 | Requires   | <Link to Basic NFT TIP here>       |
 | Status | In Progress       |
@@ -23,11 +23,11 @@ Secret NFTs require the generation , exchange and storage of cryptographic keys 
 
 While the blockchain as a public ledger of transactions provides irrefutable proof of ownership of NFTs, it does not meet the privacy of data needed for many NFT use cases. Secret NFTs have been designed by Ternoa with this in mind. Examples of private data that can be stored in NFTs include private images or videos, limited edition audio releases by music artists, private documents with long-term storage such as legal deed containing inheritance details and confidential company details.
 
-## Specification - Onchain
+## Specification
 
 ### Secret NFT onchain lifecycle states
 Secret NFTs will have the following lifecycle associated with them:
-Pending Mint -> Minted -> Pending Burn -> Burned.
+Pending Mint -> Minted -> Burned.
 
 Secret NFT should support the following onchain interfaces:
 ```
@@ -48,12 +48,6 @@ interface {
 
   MintSecretNFT(cid offchain_uri, uint256 royalty, u32 collection_id?, bool is_soulbound);
 
-  /// Interface Id: TIP500-04
-  /// Description: This interface would be used to burn a secret NFT.
-  /// Constraint(s):
-  ///     - When Secret NFT is burned, its status should be set to 'Pending Burn'. Burning of secret NFT would be done only when all the secret shares associated with the NFT have been deleted from the enclaves.
-
-  BurnSecretNFT(uint256 nft_id)
 
   /// Interface Id: TIP500-03
   /// Description: This interface is called by each of the TEE enclaves to confirm receipt of secret share for a given NFT. When all enclaves from a cluster confirm receipt of threshold shares, the secret NFT status goes to 'Minted', after which it can be transferred or listed on marketplace. This is a private interface available only for the enclaves to use
@@ -63,19 +57,12 @@ interface {
   
   SecretShareReceivedForNFT(uint256 nft_id, uint32 enclave_id)
 
-  /// Interface Id: TIP500-04
-  /// Description: This interface is called by each of the TEE enclaves when the secret share associated with a secret NFT has been deleted by the wallet/dApp. This is a private interface available only for the enclaves to use
-  /// Constraint(s): 
-  ///       - Only enclaves can use this interface. Not to be used by dApps or users.
-  ///       - When all the secret shares for an NFT have been confirmed to be deleted, the Secret NFT can be burned. Verify that the NFT is in 'Pending Burn' State before the burn is performed.  
-  
-  SecretShareDeletedForNFT(uint256 nft_id, uint32 enclave_id)
-
 }
 
 Additionally Secret NFTs should support the following interfaces which are already implemented in Basic NFT (so, no additional work is expected to support these interfaces):
 1. Transfer a secret NFT from one wallet to another
 2. List/Buy/Sell a secret NFT on a marketplace
+3. Burn
 ```
 
 ## Additional Info
@@ -102,9 +89,7 @@ The format for the offchain metadata of Secret NFT is suggested here:
 ```
 This metadata of secret NFT will be stored on IPFs, and it’s content Id (CID) will be stored onchain.
 
-## Specification - Offchain
-
-One of the primary challenges to be solved in implementing secret NFTs is the secure storage and retrieval of the encryption keys associated with each Secret NFT. The architecture proposed involves storage and retrieval of keys in a trusted execution environment (TEE) which is an offchain component associated with the secret NFT solution. TEE programs running on processors such as SGX provide strong trust guarantees in terms of data privacy and verification of the programs running within them. This can be achieved through techniques such as remote attestation that gives assurance that the program running inside the enclave is running on genuine TEE hardware (such as SGX), and the programs have not been modified by the TEE node operators. Data storage on TEEs are also secured by sealing them with the secure keys associated with the TEE hardware and/or author of the TEE programs.
+## End-to-end workflow (Ternoa-specific)
 
 The following is the workflow proposed for minting secret NFTs:
 1. User selects a media or custom data for storing privately in a secret NFT.
@@ -115,6 +100,7 @@ The following is the workflow proposed for minting secret NFTs:
 6. The offchain metadata file is stored on IPFS, and its content id (CID) is used to trigger an extrinsic on the blockchain to mint a secret NFT.
 7. The id of the new NFT is obtained from the blockchain by the wallet/Dapp using  Ternoa SDK. 
 8. The secret key used to encrypt the secret data is split into shares using a threshold secret scheme (such as Shamir Secret Shares). 
+9. Discovery of enclave locations (TBD)
 9. Each threshold share is then stored on a different enclave along with the associated NFT id. The number of threshold shares of the encryption key should be equal to the number of TEE enclaves running as offchain components.
 10. Each TEE enclaves then posts a transaction on the blockchain confirming receipt of the secret share for a given NFT. 
 
@@ -131,18 +117,6 @@ The enclave program should run within a TEE environment with the following chara
 3. The enclave program should support remote attestation, which is a servie offered by the TEE processor vendor.
 4. Each of the TEE machines should store one of the secret shares associated with an NFT. If the TEE cluster comprises of 5 machines as recommended, there would be a set of five secret shares generated each of which is stored on one of the TEE machines through a request to the TEE enclave program.
 5. There should be a stand-by TEE cluster of 5 machines that can be manually activated if the primary TEE cluster malfunctions. There should be ability for the secret shares stored in the primary TEE cluster to be securely transferred to the backup TEE cluster, so that the secondary TEE cluster can be activated in case of contingencies.
-
-The interfaces supported by the TEE enclave are describe below:
-```
-interface {
-/// Store a secret share
-StoreSecretShare(uint256 nft_id, bytes secret_share);
-
-/// Retrieve a secret share
-RetrieveSecretShare(uint256 nft_id);
-}
-
-```
 
 ## Constraints
 * The secret NFT on the blockchain should be kept in 'Pending' status until all the secret shares for that NFT are stored on the TEE enclaves.
