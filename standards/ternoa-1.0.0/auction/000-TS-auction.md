@@ -150,7 +150,7 @@ This pallet is implemented to give more flexbility to selling Ternoa's NFTs.
       "auction::AuctionDurationIsTooLong",
       "auction::AuctionDurationIsTooShort",
       "auction::AuctionStartIsTooFarAway",
-	    "auction::BuyItPriceCannotBeLessOrEqualThanStartPrice",
+      "auction::BuyItPriceCannotBeLessOrEqualThanStartPrice",
       "auction::CannotListNotOwnedNFTs",
       "auction::CannotListListedNFTs",
       "auction::CannotListCapsulesNFTs",
