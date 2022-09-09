@@ -2,7 +2,7 @@
 
 ## What is a TSP?
 
-TSP is a standard document to explain an implemented feature on Ternoa. 
+TSP is a standard document that provide technical specifications and detailled explanations of an implemented feature on Ternoa. 
 
 ## Mission
 
