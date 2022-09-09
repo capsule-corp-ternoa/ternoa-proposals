@@ -30,7 +30,8 @@ Secret NFTs will have the following lifecycle associated with them:
 Pending Mint -> Minted -> Burned.
 
 Secret NFT should support the following onchain interfaces:
-```
+
+```rust
 interface {
 
   /// Interface Id: TIP500-01
