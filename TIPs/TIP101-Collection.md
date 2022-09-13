@@ -1,4 +1,4 @@
-# Ternoa Improvement Proposal - Secret NFTs
+# Ternoa Improvement Proposal - Collections
 
 | Author(s)      | Ghali El Ouarzazi |
 | ----------- | ----------- |
