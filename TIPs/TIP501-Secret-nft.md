@@ -6,7 +6,7 @@
 | TIP Number   | TIP501       |
 | Version   | v0.1       |
 | Requires   | <Link to Basic NFT TIP here>       |
-| Status | In Progress       |
+| Status | Draft       |
 | Category   | NFT       |
 | Discussions-To   | https://github.com/capsule-corp-ternoa/ternoa-hub/discussions     |
 
@@ -25,46 +25,83 @@ While the blockchain as a public ledger of transactions provides irrefutable pro
 
 ## Specification
 
-### Secret NFT onchain lifecycle states
+### Lifecycle states
+
 Secret NFTs will have the following lifecycle associated with them:
 Pending Mint -> Minted -> Burned.
+
+### External interfaces
 
 Secret NFT should support the following onchain interfaces:
 
 ```rust
 interface {
 
-  /// Interface Id: TIP500-01
-  /// Description: User can convert a Basic NFT into a Secret NFT
-  /// Constraint(s): 
-  ///       - The Basic NFT should not be listed in a marketplace or delegated at the time of conversion to Secret NFT
-  ///       - The Secret NFT when minted should initially be set to 'Pending Mint' State. Only when all the secret shares associated with the NFT have been stored in the enclaves, should the Secret NFT move to 'Minted' state.
+  /// Interface Id: TIP501-01
+  /// Description: User can convert an existing Basic NFT into a Secret NFT
+  /// Constraint(s): Refer to section 'Rules'
   
-  ConvertBasicToSecretNFT(cid ipfs_hash, uint256 nft_id );
+  convert_basic_to_secret_nft(cid ipfs_hash, NFTId nft_id );
   
-  /// Interface Id: TIP500-02
-  /// Description: User can directly mint a Secret NFT
-  /// Constraint(s): 
-  ///       - The Secret NFT when minted should initially be set to 'Pending Mint' State. Only when all the secret shares associated with the NFT have been stored in the enclaves, should the Secret NFT move to 'Minted' state.
+  /// Interface Id: TIP501-02
+  /// Description: User can directly create an on-chain Secret NFT
+  /// Constraint(s): Refer to section 'Rules'
 
-  MintSecretNFT(cid offchain_uri, uint256 royalty, u32 collection_id?, bool is_soulbound);
+  create_secret_nft(cid offchain_uri, Permill royalty, CollectionId collection_id?, bool is_soulbound);
 
 
-  /// Interface Id: TIP500-03
+  /// Interface Id: TIP501-03
   /// Description: This interface is called by each of the TEE enclaves to confirm receipt of secret share for a given NFT. When all enclaves from a cluster confirm receipt of threshold shares, the secret NFT status goes to 'Minted', after which it can be transferred or listed on marketplace. This is a private interface available only for the enclaves to use
-  /// Constraint(s): 
-  ///       - Only enclaves can use this interface. Not to be used by dApps or users.
-  ///       - When all the secret shares associated with a secret NFT have been confirmed to be received, then the NFT state should be changed from 'Pending Mint' to 'Minted'
+  /// Constraint(s): Refer to section 'Rules'
   
-  SecretShareReceivedForNFT(uint256 nft_id, uint32 enclave_id)
+  secret_share_received_for_nft(NFTId nft_id, uint32 enclave_id)
+
+  /// Interface Id: TIP501-04
+  /// Description: This interface transfers the NFT from one account to another account.
+  /// Constraint(s): None
+
+  transfer_nft(NFTId nft_id, AccountId destination_account)
+
+  /// Interface Id: TIP501-05
+  /// Description: This interface removes an NFT from storage.This operation is irreversible.
+  /// Constraint(s): Same as for Basic NFT
+
+  burn_nft(NFTId nft_id)
+
+  /// Interface Id: TIP501-06
+  /// Description: This interface lists an NFT on a marketplace for sale at the specified price.
+  /// Constraint(s): Same as for Basic NFT
+
+  list_nft(NFTId nft_id, Balance price, MarketplaceId marketplace_id)
+
+  /// Interface Id: TIP501-07
+  /// Description: This interface unlists an NFT from a marketplace.
+  /// Constraint(s): Same as for Basic NFT
+
+  unlist_nft(NFTId nft_id)
+
+  /// Interface Id: TIP501-08
+  /// Description: This interface allows an account to buy an NFT from a marketplace
+  /// Constraint(s): Same as for Basic NFT
+
+  buy_nft(NFTId nft_id)  
 
 }
 
-Additionally Secret NFTs should support the following interfaces which are already implemented in Basic NFT (so, no additional work is expected to support these interfaces):
-1. Transfer a secret NFT from one wallet to another
-2. List/Buy/Sell a secret NFT on a marketplace
-3. Burn
 ```
+
+### Rules and constraints
+
+#### convert_basic_to_secret_nft
+- The Basic NFT should not be listed in a marketplace or delegated at the time of conversion to Secret NFT
+- The Secret NFT when minted should initially be set to 'Pending Mint' State. Only when all the secret shares associated with the NFT have been stored in the enclaves, should the Secret NFT move to 'Minted' state.
+
+#### create_secret_nft
+- The Secret NFT when minted should initially be set to 'Pending Mint' State. Only when all the secret shares associated with the NFT have been stored in the enclaves, should the Secret NFT move to 'Minted' state.
+
+#### secret_share_received_for_nft
+- Only enclaves can use this interface. Not to be used by dApps or users.
+- When all the secret shares associated with a secret NFT have been confirmed to be received, then the NFT state should be changed from 'Pending Mint' to 'Minted'
 
 ## Additional Info
 
@@ -119,8 +156,6 @@ The enclave program should run within a TEE environment with the following chara
 4. Each of the TEE machines should store one of the secret shares associated with an NFT. If the TEE cluster comprises of 5 machines as recommended, there would be a set of five secret shares generated each of which is stored on one of the TEE machines through a request to the TEE enclave program.
 5. There should be a stand-by TEE cluster of 5 machines that can be manually activated if the primary TEE cluster malfunctions. There should be ability for the secret shares stored in the primary TEE cluster to be securely transferred to the backup TEE cluster, so that the secondary TEE cluster can be activated in case of contingencies.
 
-## Constraints
-* The secret NFT on the blockchain should be kept in 'Pending' status until all the secret shares for that NFT are stored on the TEE enclaves.
 
 ## Test cases
 
