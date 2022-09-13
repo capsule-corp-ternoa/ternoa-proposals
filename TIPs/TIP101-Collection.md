@@ -1,3 +1,4 @@
+
 # Ternoa Improvement Proposal - Collections
 
 | Author(s)      | Ghali El Ouarzazi |
@@ -34,23 +35,23 @@ interface {
   /// Interface Id: TIP101-01
   /// Description: User can create an NFT with any existing collection he owns.
   /// Constraint(s): 
-  ///       - The collection must not be closed.
-  ///       - The collection must not have reached limit if it has one.
+  ///		- The collection must not be closed.
+  ///		- The collection must not have reached limit if it has one.
   ///		- Collection must be owned.
   create_nft(owner: AccountId, offchain_data: BoundedVec<u8, NFTOffchainDataLimit>, royalty: Permill, collection_id: Option<CollectionId>, is_soulbound: bool);
   
   /// Interface Id: TIP101-02
   /// Description: User can create a new collection.
   /// Constraint(s): 
-  ///       - None
+  ///		- None
   create_collection(offchain_data, BoundedVec<u8, CollectionOffchainDataLimit>, limit: Option<u32>);
 
 
   /// Interface Id: TIP101-03
   /// Description: User can add NFTs to his collection.
   /// Constraint(s):  
-  ///       - The collection must not be closed.
-  ///       - The collection must not have reached limit if it has one.
+  ///		- The collection must not be closed.
+  ///		- The collection must not have reached limit if it has one.
   ///		- NFT must not already be in a collection.
   ///		- NFT must be owned.
   ///		- Collection must be owned.
@@ -60,7 +61,7 @@ interface {
   /// Description: User can add NFTs to his collection.
   /// Constraint(s):  
   ///		- Collection must be owned.
-  ///       - The collection must be empty. (If NFTs are in the collection, they need to be burned)
+  ///		- The collection must be empty. (If NFTs are in the collection, they need to be burned)
   burn_collection(collection_id: CollectionId);
 
   /// Interface Id: TIP101-05
@@ -80,6 +81,11 @@ interface {
   limit_collection(collection_id: CollectionId, limit: u32);
 }
 ```
+## Constraints
+
+ - Collection must not be close or limited to add an NFT in it
+ - Collection must be owned to add NFT in it
+ - Collection must be empty to be burned
 
 ## Additional Info
 
@@ -140,8 +146,6 @@ The following is the workflow proposed for burning a collection with NFT in it:
  2. User triggers the "burn_nft" function for each NFTs in the collection. If he doesn't own all the NFTs, hs won't be able to burn them and burn the collection.
  3. User triggers the "burn_collection" function specifying the collection id
  4. Collection does not exist anymore
-
-## Constraints
 
 ## Test cases
 
