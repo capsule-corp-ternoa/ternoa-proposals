@@ -1,4 +1,3 @@
-
 # Ternoa Improvement Proposal - Collections
 
 | Author(s)      | Ghali El Ouarzazi |
@@ -27,19 +26,10 @@ The main objective of collections are to give a way to group NFTs. Grouping can 
 
 ## Specification
 
-### Collection onchain lifecycle states
+### Collection External Interfaces
 Collections support the following onchain interfaces:
 ```rust
-interface {
-
-  /// Interface Id: TIP101-01
-  /// Description: User can create an NFT with any existing collection he owns.
-  /// Constraint(s): 
-  ///		- The collection must not be closed.
-  ///		- The collection must not have reached limit if it has one.
-  ///		- Collection must be owned.
-  create_nft(owner: AccountId, offchain_data: BoundedVec<u8, NFTOffchainDataLimit>, royalty: Permill, collection_id: Option<CollectionId>, is_soulbound: bool);
-  
+interface { 
   /// Interface Id: TIP101-02
   /// Description: User can create a new collection.
   /// Constraint(s): 
@@ -81,10 +71,26 @@ interface {
   limit_collection(collection_id: CollectionId, limit: u32);
 }
 ```
+
+### Existing Interfaces changed for collections
+```rust
+interface {
+  /// Interface Id: TIP101-01
+  /// Description: User can create an NFT with any existing collection he owns.
+  /// Constraint(s): 
+  ///		- The collection must not be closed.
+  ///		- The collection must not have reached limit if it has one.
+  ///		- Collection must be owned.
+  create_nft(owner: AccountId, offchain_data: BoundedVec<u8, NFTOffchainDataLimit>, royalty: Permill, collection_id: Option<CollectionId>, is_soulbound: bool);
+}
+```
+
 ## Constraints
 
  - Collection must not be close or limited to add an NFT in it
  - Collection must be owned to add NFT in it
+ - Collection must be owned to close it
+ - Collection must be owned to add a limit
  - Collection must be empty to be burned
 
 ## Additional Info
