@@ -41,7 +41,7 @@ interface {
   /// Constraint(s): 
   ///       - The user must be the creator of the NFT
   ///       - The user must be the owner of the NFT
-  ///		- The NFT must be available (not listed, delegated, rented, ...)
+  ///		     - The NFT must be available (not listed, delegated, rented, ...)
   set_royalty(nft_id: NFTId, royalty: permill);
 }
 ```
@@ -57,6 +57,7 @@ interface {
 ```
 ## Constraints
  - User must be owner and creator of an NFT to set its royalty.
+ - NFT mus be available to set its royalty
 
 ## Additional Info
 
