@@ -30,14 +30,14 @@ The main objective of collections are to give a way to group NFTs. Grouping can 
 Collections support the following onchain interfaces:
 ```rust
 interface { 
-  /// Interface Id: TIP101-02
+  /// Interface Id: TIP101-01
   /// Description: User can create a new collection.
   /// Constraint(s): 
   ///		- None
   create_collection(offchain_data, BoundedVec<u8, CollectionOffchainDataLimit>, limit: Option<u32>);
 
 
-  /// Interface Id: TIP101-03
+  /// Interface Id: TIP101-02
   /// Description: User can add NFTs to his collection.
   /// Constraint(s):  
   ///		- The collection must not be closed.
@@ -47,21 +47,21 @@ interface {
   ///		- Collection must be owned.
   add_nft_to_collection(nft_id: NFTId, collection_id: CollectionId);
 
-  /// Interface Id: TIP101-04
+  /// Interface Id: TIP101-03
   /// Description: User can add NFTs to his collection.
   /// Constraint(s):  
   ///		- Collection must be owned.
   ///		- The collection must be empty. (If NFTs are in the collection, they need to be burned)
   burn_collection(collection_id: CollectionId);
 
-  /// Interface Id: TIP101-05
+  /// Interface Id: TIP101-04
   /// Description: User can close a collection signalling that no more NFTs will be added in the collection.
   /// Constraint(s):  
   ///		- Collection must be owned.
   ///		- Collection must not be already closed.
   close_collection(collection_id: CollectionId);
   
-  /// Interface Id: TIP101-06
+  /// Interface Id: TIP101-05
   /// Description: User can add a maximum number of NFTs as a limit to his collection. Once the collection reaches that number of collection, it will be considered limited (complete)
   /// Constraint(s):  
   ///		- Collection must be owned.
@@ -75,7 +75,7 @@ interface {
 ### Existing Interfaces changed for collections
 ```rust
 interface {
-  /// Interface Id: TIP101-01
+  /// Interface Id: TIP101-06
   /// Description: User can create an NFT with any existing collection he owns.
   /// Constraint(s): 
   ///		- The collection must not be closed.
