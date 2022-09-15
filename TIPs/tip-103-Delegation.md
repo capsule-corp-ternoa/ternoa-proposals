@@ -41,7 +41,7 @@ interface {
 
 ## Constraints
  - User must be owner of an NFT to set its delegatee.
- - NFT mus be free to set its delegatee.
+ - NFT must be free to set its delegatee.
 
 ## Additional Info
 
