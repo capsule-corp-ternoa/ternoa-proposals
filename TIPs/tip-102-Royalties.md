@@ -57,7 +57,7 @@ interface {
 ```
 ## Constraints
  - User must be owner and creator of an NFT to set its royalty.
- - NFT mus be available to set its royalty
+ - NFT must be available to set its royalty
 
 ## Additional Info
 
