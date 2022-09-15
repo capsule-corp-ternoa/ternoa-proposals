@@ -45,7 +45,7 @@ interface {
   set_royalty(nft_id: NFTId, royalty: permill);
 }
 ```
-### Existing Interfaces changed for collections
+### Existing Interfaces changed for royalties
 ```rust
 interface {
   /// Interface Id: TIP102-02
