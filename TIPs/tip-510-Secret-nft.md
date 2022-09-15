@@ -3,7 +3,7 @@
 | Author(s)      | Mohsin Riaz, Amin Razavi, Prabhu Eshwarla |
 | ----------- | ----------- |
 | Created   | 7 Sep 2022       |
-| TIP Number   | TIP501       |
+| TIP Number   | TIP-510       |
 | Version   | v0.1       |
 | Requires   | <Link to Basic NFT TIP here>       |
 | Status | In Progress       |
