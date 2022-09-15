@@ -15,3 +15,6 @@ The goal of the Ternoa Proposals project is to document standardized protocols f
 ## How to suggest a proposal?
 
 To suggest a proposal, you can create a Pull Request with your new proposal as a TIP or TSP following our template. Each new proposal will be review by the PC (Product Council) of Ternoa. After reviewing, some feedbacks will be share or directly validated by the PC.
+
+- [TIP Template](https://github.com/capsule-corp-ternoa/ternoa-proposals/blob/main/TIPs/tip-template.md)
+- [TSP Template](https://github.com/capsule-corp-ternoa/ternoa-proposals/blob/main/TSPs/tsp-template.md)
