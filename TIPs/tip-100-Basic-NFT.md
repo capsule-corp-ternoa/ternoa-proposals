@@ -3,7 +3,7 @@
 | Author(s)      | Prabhu Eshwarla |
 | ----------- | ----------- |
 | Created   | 14 Sep 2022       |
-| TIP Number   | TIP100       |
+| TIP Number   | TIP-100       |
 | Version   | v0.1       |
 | Requires   |       |
 | Status | Draft       |

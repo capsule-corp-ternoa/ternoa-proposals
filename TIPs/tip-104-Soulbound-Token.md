@@ -1,4 +1,4 @@
-# Ternoa Improvement Proposal - Soulbound NFT
+# Soulbound Token (SBT) - TIP
 
 | Author(s)      | Ghali El Ouarzazi |
 | ----------- | ----------- |
