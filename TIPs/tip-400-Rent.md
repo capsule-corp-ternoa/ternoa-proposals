@@ -198,6 +198,10 @@ interface {
 #### Accept Subscription Terms Interface
 - Contract MUST be marked as not-changed.
 
+### Rented State
+If an NFT is in Rented state it means that the NFT renter cannot call any extrinsic (this includes but is not limited to: Transfer, Burn, List, Auction,...) on it besides the `cancel_contract` or `revoke_contract`.
+If an NFT is in Rented state it means that the NFT rentee cannot call any extrinsic (this includes but is not limited to: Transfer, Burn, List, Auction,...) on it besides the `revoke_contract`.
+
 ## Metadata
 No Metadata
 
@@ -207,7 +211,7 @@ Prerequisites: The User owns an NFT that is in the right state (NOT Capsule, Lis
 #### Flow
 1. The User decides if he wants to have a Fixed Term or a Subscription Term contract.
 2. The user decides if he wants to use auto acceptance (the first offer is immediately accepted) or manual acceptance (the users chooses which offer to accept).
-3. The User decides if he wants to introduce a whitelist where only certain accounts can send offers.
+3. The User decides if he wants to introduce a whitelist where only certain accounts can send offers or rent.
 4. The User decides if he wants to have a contract where he can or cannot cancel it.
 5. The User decides if he wants for the Subscription Term to be changeable or not.
 6. The User decides if he wants to specify a Token based or NFT based Rent Fee.
@@ -278,7 +282,8 @@ Prerequisites: A Contract already exists for the observed NFT.
 * Renter can accept an offer
 * Renter can update subscription terms contract
 * Rentee can accept new subscritpion terms contract
-* Renter or Rentee can revoke contract
+* Rentee can revoke contract
+* Renter can revoke contract (if allowed and if not allowed)
 * Renter can cancel contract
  
 ## References
