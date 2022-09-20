@@ -39,7 +39,7 @@ interface {
   /// Description: A NFT owner can create a rental contract with his NFT.
   /// Constraint(s): Refer to section 'Rules'
   
-  create_contract(nft_id: NFTId, duration: Duration, acceptance_type: AcceptanceType, rent_fee: RentFee, renter_cancellation_fee: Option<CancellationFee>, rentee_cancellation_fee: Option<CancellationFee>)
+  create_contract(nft_id: NFTId, duration: Duration, acceptance_type: AcceptanceType, rent_fee: RentFee, renter_cancellation_fee: Option<CancellationFee>, rentee_cancellation_fee: Option<CancellationFee>);
   
   /// Interface Id: TIP400-02
   /// Description: The NFT Renter or NFT Rentee can revoke a rental contract.
@@ -128,7 +128,7 @@ interface {
   /// Description: ROOT - Triggered by the chain only,  when a contract ended.
   /// Constraint(s): None
   
-  end_contract(nft_id: NFTId)
+  end_contract(nft_id: NFTId);
   
   /// Interface Id: TIP400-09
   /// Description: ROOT - Triggered by the chain only,  when a subscription contract periode is renewed.
