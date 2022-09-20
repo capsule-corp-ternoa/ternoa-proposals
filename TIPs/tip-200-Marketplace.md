@@ -59,7 +59,7 @@ interface {
   /// Interface Id: TIP200-02
   /// Description: User can transfer ownership of a marketplace.
   /// Constraint(s): 
-  ///       - User needs to be the owner of the marketplace
+  ///       - User must be the owner of the marketplace
   set_marketplace_owner(marketplace_id: MarketplaceId, recipient: AccountId);
   
   /// Interface Id: TIP200-03
@@ -68,22 +68,22 @@ interface {
   /// 	Public mean that anyone can list except the addresses put in the account_list (ban_list).
   /// 	Private mean that no one can list except the addresses put in the account_list (allow_list).
   /// Constraint(s): 
-  ///       - User needs to be the owner of the marketplace
-  ///		- If public -> private, accout_list becomes an allow list instead of a ban list
- ///		- If private -> public, accout_list becomes a ban list instead of an allow list
+  ///       - User must be the owner of the marketplace
+  ///	    - If public -> private, accout_list becomes an allow list instead of a ban list
+ ///	    - If private -> public, accout_list becomes a ban list instead of an allow list
   set_marketplace_kind(marketplace_id: MarketplaceId, recipient: AccountId);
 
   /// Interface Id: TIP200-04
   /// Description: User can change the configuration option of the marketplace. He can change the commission_fee, the listing_fee, the account_list and the offchain data.
   /// Constraint(s): 
-  ///       - User needs to be the owner of the marketplace
+  ///       - User must be the owner of the marketplace
   set_marketplace_configuration(marketplace_id: MarketplaceId, commission_fee: ConfigOp<CompoundFee<Balance>>, listing_fee: ConfigOp<CompoundFee<Balance>>, account_list: ConfigOp<BoundedVec<AccountId, AccountSizeLimit>>, offchain_data: ConfigOp<BoundedVec<u8, offchainDataLimit>>);
 
   /// Interface Id: TIP200-05
   /// Description: User can list an NFT for direct sale if authorized in the marketplace.
   /// Constraint(s): 
   ///		- NFT must be available
-  ///       - User must be the owner of the NFT
+  ///       	- User must be the owner of the NFT
   ///		- User must be authorized
   ///		- User must have enough funds to cover for listing fee in case it exists
   ///		- User must have enough funds to cover for the flat commission fee if it exists
@@ -100,7 +100,7 @@ interface {
   /// Description: User can buy a listed NFT.
   /// Constraint(s): 
   ///		- NFT needs to be on sale
-  ///       - User must not be the owner of the NFT
+  ///       	- User must not be the owner of the NFT
   ///		- User must have enough funds to pay the NFT price
   buy_nft(nft_id: NFTId);
 }
