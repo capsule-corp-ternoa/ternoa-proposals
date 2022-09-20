@@ -34,120 +34,168 @@ Rental NFT should support the following onchain interfaces:
 
 ```rust
 interface {
-
   /// Interface Id: TIP400-01
-  /// Description: A NFT owner can create a rental contract with his NFT.
+  /// Description: The Caller creates a renting contract out of his NFT.
   /// Constraint(s): Refer to section 'Rules'
-  
-  create_contract(nft_id: NFTId, duration: Duration, acceptance_type: AcceptanceType, rent_fee: RentFee, renter_cancellation_fee: Option<CancellationFee>, rentee_cancellation_fee: Option<CancellationFee>);
+  /// Result(s): Refer to section 'Results'
+  create_contract(nft_id: NFTId, duration: Duration, acceptance_type: AcceptanceType, renter_can_cancel: bool,  rent_fee: RentFee, renter_cancellation_fee: Option<CancellationFee>, rentee_cancellation_fee: Option<CancellationFee>);
   
   /// Interface Id: TIP400-02
-  /// Description: The NFT Renter or NFT Rentee can revoke a rental contract.
+  /// Description: The Caller revokes a running contract.
   /// Constraint(s): Refer to section 'Rules'
-
+  /// Result(s): Refer to section 'Results'
   revoke_contract(nft_id: NFTId);
 
-
   /// Interface Id: TIP400-03
-  /// Description: Depending on the type of acceptance and the acceptance list, the NFT Rentee will provide a rent offer, if the rental contract is in manual acceptance, or directly rent the NFT if the rental contract is in automatic acceptance.
-  /// Constraint(s): None
-  
-  rent(nft_id: NFTId);
+  /// Description: The Caller cancel a non-running contract.
+  /// Constraint(s): Refer to section 'Rules'
+  /// Result(s): Refer to section 'Results'
+  cancel_contract(nft_id: NFTId);
 
   /// Interface Id: TIP400-04
-  /// Description: The NFT Renter can accept one of the rent offers if contract is set as manual acceptance.
+  /// Description: The Caller accepts a existing non-running contract.
   /// Constraint(s): Refer to section 'Rules'
-
-  accept_rent_offer(nft_id: NFTId, rentee: AccountId)
+  /// Result(s): Refer to section 'Results'
+  rent(nft_id: NFTId);
 
   /// Interface Id: TIP400-05
-  /// Description: The NFT Rentee can retract an offer made for a Rental NFT.
+  /// Description: The Caller creates a offer for an existing non-running contract.
   /// Constraint(s): Refer to section 'Rules'
-
-  retract_rent_offer(nft_id: NFTId)
+  /// Result(s): Refer to section 'Results'
+  make_rent_offer(nft_id: NFTId);
 
   /// Interface Id: TIP400-06
-  /// Description: The NFT Renter can change the subscription terms (duration and amount)
+  /// Description: The Caller accepts a offer for an existing non-running contract.
   /// Constraint(s): Refer to section 'Rules'
-
-  change_subscription_terms(nft_id: NFTId, duration: Duration.Subscription, amount: Balance)
+  /// Result(s): Refer to section 'Results'
+  accept_rent_offer(nft_id: NFTId);
 
   /// Interface Id: TIP400-07
-  /// Description: The NFT Rentee can accept the new subscription terms.
-  /// Constraint(s): None
+  /// Description: The Caller removes his offer.
+  /// Constraint(s): Refer to section 'Rules'
+  /// Result(s): Refer to section 'Results'
+  retract_rent_offer(nft_id: NFTId)
 
+  /// Interface Id: TIP400-08
+  /// Description: The Caller changes the subscription terms.
+  /// Constraint(s): Refer to section 'Rules'
+  /// Result(s): Refer to section 'Results'
+  change_subscription_terms(nft_id: NFTId, period: BlockNumber, max_duration: Option<BlockNumber>, rent_fee: Balance, changeable: bool)
+
+  /// Interface Id: TIP400-09
+  /// Description: The Caller accepts the changed subscription terms.
+  /// Constraint(s): Refer to section 'Rules'
+  /// Result(s): Refer to section 'Results'
   accept_subscription_terms(nft_id: NFTId)
 }
 
 ```
 
 ### Rules and constraints
-#### Create_contract
-- The NFT can not be listed in a marketplace, delegated or on auction to be a rental contract.
-- A rental contract can only be created by the NFT owner.
-- Rented NFTs cannot be delegated, transfered, burnned, listed or aucitoned.
-- Royalties can not be set for rented NFTs.
-
-#### Revoke_contract
-- Cancellation fee (fixed/flexible amount or NFT) is charged on revocation if mentioned in the contract.
-- Contract can only be revoked by NFT Renter or NFT Rentee
-#### Additionnal Rules of revocation :
-- If Contract Duration Type is Fixed and Contract Revocation Type is NoRevocation: Only rentee can revoke 
-- If Contract Duration Type is Fixed and Contract Revocation Type is AnyTime: Both NFT Renter or NFT Rentee can revoke
-- Contract Duration Type Fixed with Contract Revocation Type OnSubscriptionChange is not possible.
-- If Contract Duration Type is Infinite and Contract Revocation Type is NoRevocation: Only rentee can revoke 
-- If Contract Duration Type is Infinite and Contract Revocation Type is AnyTime: Both NFT Renter or NFT Rentee can revoke
-- Contract Duration Type Infinite with Contract Revocation Type OnSubscriptionChange is not possible.
-- If Contract Duration Type is Subscription and Contract Revocation Type is NoRevocation: Only rentee can revoke 
-- If Contract Duration Type is Subscription and Contract Revocation Type is AnyTime: Both NFT Renter or NFT Rentee can revoke
-- If Contract Duration Type is Subscription and Contract Revocation Type is OnSubscriptionChange: Both NFT Renter or NFT Rentee can revoke
-#### Additionnal Rules about Cancellation Fees : 
-- Flexible Tokens can only be applied for Fixed Contract Duration:  Fees will be calculated on a Pro-Rata basis.
-
+#### Create Contract
+- Provided NFT MUST be owned by the Caller.
+- Provided NFT MUST NOT be in the following states: Capsule, ListedForSale, Delegated, Soulbound, Rented.
+- Provided Rent NFT Fee MUST exist.
+- Provided Renter Cancellation NFT Fee MUST be owned by the Caller.
+- Provided Renter Cancellation Token Fee MUST be less then the free balance of Caller.
+- Provided Rentee Cancellation NFT Fee MUST exist.
+#### Revoke Contract
+- There MUST be a contract for the provided NFT.
+- The Contract MUST be running.
+- The Caller MUST be a contract participant (either the renter or rentee).
+#### Cancel Contract
+- There MUST be a contract for the provided NFT.
+- The Contract MUST NOT be running.
+- The Caller MUST be the owner of the contract.
 #### Rent
-- NFT renter can't rent the NFT
+- There MUST be a contract for the provided NFT.
+- The Contract MUST NOT be running.
+- The Contract MUST have the acceptance_type set to Automatic
+- The Caller MUST NOT be the owner of the contract.
+- If a whitelist exists, the Caller MUST be whitelisted.
+- If the Rent Fee is an NFT, the Caller MUST own that NFT.
+- If the Rent Fee is an NFT, the NFT MUST NOT be in the following states: Capsule, ListedForSale, Delegated, Soulbound, Rented.
+- If the Rent Fee is of Token type, the Caller MUST have enough balance to pay for it.
+- If a Cancellation NFT Fee exists, the Caller MUST own that NFT.
+- If a Cancellation NFT Fee exists, the NFT MUST NOT be in the following states: Capsule, ListedForSale, Delegated, Soulbound, Rented.
+- If a Cancellation Token Fee exists, the Caller MUST have enough balance to pay for it.
+#### Make Rent Offer
+- There MUST be a contract for the provided NFT.
+- The Contract MUST NOT be running.
+- The Contract MUST have the acceptance_type set to Manual
+- The Caller MUST NOT be the owner of the contract.
+- If a whitelist exists, the Caller MUST be whitelisted.
+- If the Rent Fee is an NFT, the Caller MUST own that NFT.
+- If the Rent Fee is an NFT, the NFT MUST NOT be in the following states: Capsule, ListedForSale, Delegated, Soulbound, Rented.
+- If the Rent Fee is of Token type, the Caller MUST have enough balance to pay for it.
+- If a Cancellation NFT Fee exists, the Caller MUST own that NFT.
+- If a Cancellation NFT Fee exists, the NFT MUST NOT be in the following states: Capsule, ListedForSale, Delegated, Soulbound, Rented.
+- If a Cancellation Token Fee exists, the Caller MUST have enough balance to pay for it.
+#### Accept Rent Offer
+- There MUST be a contract for the provided NFT.
+- The Contract MUST NOT be running.
+- The Contract MUST have the acceptance_type set to Manual
+- The Caller MUST be the owner of the contract.
+- If the Rent Fee is an NFT, the Offer-Owner MUST own that NFT.
+- If the Rent Fee is an NFT, the NFT MUST NOT be in the following states: Capsule, ListedForSale, Delegated, Soulbound, Rented.
+- If the Rent Fee is of Token type, the Offer-Owner MUST have enough balance to pay for it.
+- If a Cancellation NFT Fee exists, the Offer-Owner MUST own that NFT.
+- If a Cancellation NFT Fee exists, the NFT MUST NOT be in the following states: Capsule, ListedForSale, Delegated, Soulbound, Rented.
+- If a Cancellation Token Fee exists, the Offer-Owner MUST have enough balance to pay for it.
+#### Retract Rent Offer
+- There MUST be a offer-queue for the provided NFT.
+- The Caller MUST have an offer for that provided NFT.
+#### Change Subscription Terms
+- There MUST be a contract for the provided NFT.
+- The Caller MUST be the owner of the contract.
+- The Contract MUST be of type subscription.
+- The Contract MUST allow for changes in subscription terms.
+#### Accept Subscription Terms
+- There MUST be a contract for the provided NFT.
+- The Contract MUST be running.
+- The Caller MUST be rentee of the contract.
+- The Contract subscription terms MUST have been changed.
 
-#### Retract_rent_offer
-- Rentee can retract the offer he made until it has been accepted.
-
-#### Change_subscription_terms
-- Subscription terms can only be changed for a contract with a subscription duration and a revocation type set as OnSubscriptionChange only.
-- Both the subscription duration and amount must be updated : They should be written again with the same initial duration/amount value if one of them do not changed. 
-- New terms start at the next renewal subscription periode.
-- Duration can't be changed to infinite or fixed. 
-- rentFee can only be a tokens type, as an NFT can be used for subscription fee.
-
-### Private interfaces
-
-Rental NFT should support the following onchain private interfaces: These private interfaces are considered as native/root from the chain, and are automaticaly triggered by the chain itself during the lifecycle. User can't trigger them. 
-
-```rust
-interface {
-
-  /// Interface Id: TIP400-08
-  /// Description: ROOT - Triggered by the chain only,  when a contract ended.
-  /// Constraint(s): None
-  
-  end_contract(nft_id: NFTId);
-  
-  /// Interface Id: TIP400-09
-  /// Description: ROOT - Triggered by the chain only,  when a subscription contract periode is renewed.
-  /// Constraint(s): None
-
-  renew_contract(nft_id: NFTId);
-
-
-  /// Interface Id: TIP400-10
-  /// Description: ROOT - Triggered by the chain only,  when a contract expired.
-  /// Constraint(s): None
-  
-  remove_expired_contract(nft_id: NFTId);
-}
-
-```
+### Results
+#### Create Contract
+- Provided NFT MUST be in state `Rented`.
+- Provided Renter Cancellation NFT Fee MUST change its ownership to escrow account.
+- Provided Renter Cancellation Token Fee MUST be taken from the Caller and send to a escrow account.
+#### Revoke Contract
+- Provided NFT MUST NOT be anymore in state `Rented`.
+- The existing contract MUST be burned.
+- Provided Caller Cancellation Fee MUST be given to the the damaged party.
+- Provided Damaged Party Cancellation Fee MUST be returned to the damaged party.
+#### Cancel Contract
+- Provided NFT MUST NOT be anymore in state `Rented`.
+- The existing contract MUST be burned.
+- Provided Cancellation Fee MUST be given back to the Caller.
+#### Rent
+- The existing contract MUST contain the Caller's address as Rentee.
+- The existing contract MUST contain the start block.
+- Provided Rent NFT Fee MUST change its ownership to the contract owner address.
+- Provided Rent NFT Token Fee MUST be taken from Caller and send to contract owner address.
+- Provided Renter Cancellation NFT Fee MUST change its ownership to escrow account.
+- Provided Renter Cancellation Token Fee MUST be taken from the Caller and send to a escrow account.
+#### Make Rent Offer
+- Offers related to the contract MUST contain the Callers address.
+#### Accept Rent Offer
+- The existing contract MUST contain the Offer-Owner's address as Rentee.
+- The existing contract MUST contain the start block.
+- Provided Rent NFT Fee MUST change its ownership to the contract owner address.
+- Provided Rent NFT Token Fee MUST be taken from Offer-Owner and send to contract owner address.
+- Provided Renter Cancellation NFT Fee MUST change its ownership to escrow account.
+- Provided Renter Cancellation Token Fee MUST be taken from the Offer-Owner and send to a escrow account.
+#### Retract Rent Offer
+- Offers related to the contract MUST NOT contain the Callers address.
+#### Change Subscription Terms
+- Contract MUST be updated with the new subscription and rent values
+- Contract MUST be marked as changed.
+#### Accept Subscription Terms
+- Contract MUST be marked as not-changed.
 
 ## Metadata
-No  meta data (proper to the rent contract itself) are needed during the Rent Contract Lifecycle. 
+No Metadata
 
 ## End-to-end workflow (Ternoa-specific)
 The following is the workflow proposed for creating a contract: 
