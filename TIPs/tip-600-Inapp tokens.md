@@ -28,84 +28,60 @@ Several decentralized applications have a need to issue new assets and to move t
 ### External interfaces
 
 __In-app token__ should support the following onchain interfaces:
-```
+``` rust
 interface {
-
-// Permissionless functions
-
   /// Interface Id: TIP600-01
   /// Description: User can create a new asset class, taking the required deposit
-	/// - `id`: The identifier of the new asset. This must not be currently in use to identify
+	/// - `asset_id`: The identifier of the new asset. This must not be currently in use to identify
 	/// an existing asset.
 	/// - `admin`: The admin of this class of assets. The admin is the initial address of each
 	/// member of the asset class's admin team.
 	/// - `min_balance`: The minimum balance of this new asset that any single account must
 	/// have. If an account's balance is reduced below this, then it collapses to zero.  
   /// Constraint(s): The origin must be Signed and the sender must have sufficient funds free.
+  create(asset_id: AssetId, admin: AccountId, min_balance: Balance);
   
-  create(origin: OriginFor<T>,
-			#[pallet::compact] id: T::AssetId,
-			admin: AccountIdLookupOf<T>,
-			min_balance: T::Balance);
-  
-/// Interface Id: TIP600-02
+  /// Interface Id: TIP600-02
   /// Description: Transfer sender's assets to another account
-	/// - `id`: The identifier of the asset to have some amount transferred.
+	/// - `asset_id`: The identifier of the asset to have some amount transferred.
 	/// - `target`: The account to be credited.
 	/// - `amount`: The amount by which the sender's balance of assets should be reduced and
 	/// `target`'s balance increased. The amount actually transferred may be slightly greater in
 	/// the case that the transfer would otherwise take the sender balance above zero but below
 	/// the minimum balance. Must be greater than zero.  
   /// Constraint(s): Origin must be Signed.
-
-  transfer(origin: OriginFor<T>,
-			#[pallet::compact] id: T::AssetId,
-			target: AccountIdLookupOf<T>,
-			#[pallet::compact] amount: T::Balance)
-
-// Privileged functions
+  transfer(asset_id: AssetId, target: AccountId, amount: Balance)
 
   /// Interface Id: TIP600-03
   /// Description: Destroys an entire asset class; called by the asset class's Owner
-	/// - `id`: The identifier of the asset to be destroyed. This must identify an existing
+    /// - `asset_id`: The identifier of the asset to be destroyed. This must identify an existing
 	/// asset.  
   /// Constraint(s): The origin must conform to `ForceOrigin` or must be Signed and the sender must be the
-	/// owner of the asset `id`.
+    /// owner of the asset `asset_id`.
   /// NOTE: It can be helpful to first freeze an asset before destroying it so that you
-	/// can provide accurate witness information and prevent users from manipulating state
-	/// in a way that can make it harder to destroy.
-
-  destroy(origin: OriginFor<T>,
-			#[pallet::compact] id: T::AssetId,
-			witness: DestroyWitness)
+  /// can provide accurate witness information and prevent users from manipulating state
+  /// in a way that can make it harder to destroy.
+  destroy(asset_id: AssetId, witness: DestroyWitness)
 
   /// Interface Id: TIP600-04
   /// Description: Increases the asset balance of an account; called by the asset class's Issuer.
-	/// - `id`: The identifier of the asset to have some amount minted.
+	/// - `asset_id`: The identifier of the asset to have some amount minted.
 	/// - `beneficiary`: The account to be credited with the minted assets.
 	/// - `amount`: The amount of the asset to be minted.  
   /// Constraint(s): The origin must be Signed and the sender must be the Issuer of the asset `id`.
-
-  mint(origin: OriginFor<T>,
-			#[pallet::compact] id: T::AssetId,
-			beneficiary: AccountIdLookupOf<T>,
-			#[pallet::compact] amount: T::Balance)
+  mint(asset_id: AssetId, beneficiary: AccountId, amount: Balance)
 
   /// Interface Id: TIP600-05
   /// Description: Decreases the asset balance of an account; called by the asset class's Admin
-  /// - `id`: The identifier of the asset to have some amount burned.
-	/// - `who`: The account to be debited from.
+  /// - `asset_id`: The identifier of the asset to have some amount burned.
+	/// - `target`: The account to be debited from.
 	/// - `amount`: The maximum amount by which `who`'s balance should be reduced.
   /// Constraint(s): Origin must be Signed and the sender should be the Manager of the asset `id`.
-
-  burn(origin: OriginFor<T>,
-			#[pallet::compact] id: T::AssetId,
-			who: AccountIdLookupOf<T>,
-			#[pallet::compact] amount: T::Balance)  
+  burn(asset_id: AssetId, target: AccountId, amount: Balance)  
 
   /// Interface Id: TIP600-06
   /// Description: Transfers between arbitrary accounts; called by the asset class's Admin.
-	/// - `id`: The identifier of the asset to have some amount transferred.
+	/// - `asset_id`: The identifier of the asset to have some amount transferred.
 	/// - `source`: The account to be debited.
 	/// - `dest`: The account to be credited.
 	/// - `amount`: The amount by which the `source`'s balance of assets should be reduced and
@@ -113,57 +89,37 @@ interface {
 	/// the case that the transfer would otherwise take the `source` balance above zero but
 	/// below the minimum balance. Must be greater than zero.  
   /// Constraint(s): Origin must be Signed and the sender should be the Admin of the asset `id`.
-
-  force_transfer(origin: OriginFor<T>,
-			#[pallet::compact] id: T::AssetId,
-			source: AccountIdLookupOf<T>,
-			dest: AccountIdLookupOf<T>,
-			#[pallet::compact] amount: T::Balance)  
+  force_transfer(asset_id: AssetId, source: AccountId, dest: AccountId, amount: Balance)  
 
   /// Interface Id: TIP600-07
   /// Description: Disallows further `transfer`s from an account; called by the asset class's Freezer account.
-	/// - `id`: The identifier of the asset to be frozen.
-	/// - `who`: The account to be frozen.  
+	/// - `asset_id`: The identifier of the asset to be frozen.
+	/// - `target`: The account to be frozen.  
   /// Constraint(s): Origin must be Signed and the sender should be the Freezer of the asset `id`.
-
-  freeze(origin: OriginFor<T>,
-			#[pallet::compact] id: T::AssetId,
-			who: AccountIdLookupOf<T>)  
+  freeze(asset_id: AssetId, target: AccountId)  
 
   /// Interface Id: TIP600-08
   /// Description: Allow unprivileged transfers from an account again.
-	/// - `id`: The identifier of the asset to be frozen.
-	/// - `who`: The account to be unfrozen.  
+	/// - `asset_id`: The identifier of the asset to be frozen.
+	/// - `target`: The account to be unfrozen.  
   /// Constraint(s): Origin must be Signed and the sender should be the Admin of the asset `id`.
-
-  thaw(origin: OriginFor<T>,
-			#[pallet::compact] id: T::AssetId,
-			who: AccountIdLookupOf<T>)  
-
+  thaw(asset_id: AssetId, target: AccountId)  
 
   /// Interface Id: TIP600-09
   /// Description: Changes an asset class's Owner; called by the asset class's Owner.
-	/// - `id`: The identifier of the asset.
+	/// - `asset_id`: The identifier of the asset.
 	/// - `owner`: The new Owner of this asset.  
   /// Constraint(s): Origin must be Signed and the sender should be the Owner of the asset `id`.
-
-  transfer_ownership(origin: OriginFor<T>,
-			#[pallet::compact] id: T::AssetId,
-			owner: AccountIdLookupOf<T>)  
+  transfer_ownership(asset_id: AssetId, owner: AccountId)  
 
   /// Interface Id: TIP600-10
   /// Description: Set the metadata of an asset class; called by the asset class's Owner.
-	/// - `id`: The identifier of the asset to update.
+	/// - `asset_id`: The identifier of the asset to update.
 	/// - `name`: The user friendly name of this asset.
 	/// - `symbol`: The exchange symbol for this asset.
 	/// - `decimals`: The number of decimals this asset uses to represent one unit.  
   /// Constraint(s):  Origin must be Signed and the sender should be the Owner of the asset `id`.
-
-  set_metadata(origin: OriginFor<T>,
-			#[pallet::compact] id: T::AssetId,
-			name: Vec<u8>,
-			symbol: Vec<u8>,
-			decimals: u8)  
+  set_metadata(asset_id: AssetId, name: String, symbol: String, decimals: u8)  
 
 }
 
