@@ -18,3 +18,6 @@ To suggest a proposal, you can create a Pull Request with your new proposal as a
 
 - [TIP Template](https://github.com/capsule-corp-ternoa/ternoa-proposals/blob/main/TIPs/tip-template.md)
 - [TSP Template](https://github.com/capsule-corp-ternoa/ternoa-proposals/blob/main/TSPs/tsp-template.md)
+
+## Key words for use in TIPs to Indicate Requirement Levels
+[RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) must be followed in TIPs that use words that represents obligations or advices.
