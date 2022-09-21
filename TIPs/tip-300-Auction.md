@@ -121,6 +121,7 @@ interface {
 - To claim an amount of tokens, the user must have a pending claim (bid that did not win and is not retrieved).
 
 ## Additional Info
+- If a bid list becomes too long, to add a new bid, the first one will get "dropped" and the user will have to claim the amount to retrieve his funds even if the auction has not finished yet.
 
 ## Metadata
 
