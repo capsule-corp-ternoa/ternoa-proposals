@@ -51,7 +51,7 @@ interface {
   /// Interface Id: TIP501-03
   /// Description: This interface is called by each of the TEE enclaves to confirm receipt of secret share for a given NFT. When all enclaves from a cluster confirm receipt of threshold shares, the secret NFT status goes to 'Minted', after which it can be transferred or listed on marketplace. This is a private interface available only for the enclaves to use
   /// Constraint(s): Refer to section 'Rules'
-  secret_share_received_for_nft(NFTId nft_id, uint32 enclave_id)
+  add_secret_share(NFTId nft_id, uint32 enclave_id)
 }
 
 ```
