@@ -1,6 +1,7 @@
+
 # Ternoa Improvement Proposal - Secret NFTs
 
-| Author(s)      | Mohsin Riaz, Amin Razavi, Prabhu Eshwarla |
+| Author(s)      | Mohsin Riaz, Amin Razavi, Prabhu Eshwarla, Ghali El Ouarzazi |
 | ----------- | ----------- |
 | Created   | 7 Sep 2022       |
 | TIP Number   | TIP-510       |
@@ -33,62 +34,27 @@ Pending Mint -> Minted -> Burned.
 ### External interfaces
 
 Secret NFT should support the following onchain interfaces:
-```
+```rust
 interface {
 
   /// Interface Id: TIP501-01
   /// Description: User can convert an existing Basic NFT into a Secret NFT
   /// Constraint(s): Refer to section 'Rules'
-  
-  convert_basic_to_secret_nft(cid ipfs_hash, NFTId nft_id );
+  convert_to_secret(nft_id: NFTId, secret_offchain_data: offchain_data: BoundedVec<u8, NFTOffchainDataLimit>);
   
   /// Interface Id: TIP501-02
   /// Description: User can directly create an on-chain Secret NFT
   /// Constraint(s): Refer to section 'Rules'
-
-  create_secret_nft(cid offchain_uri, Permill royalty, CollectionId collection_id?, bool is_soulbound);
+  create_secret_nft(offchain_data: BoundedVec<u8, NFTOffchainDataLimit>, secret_offchain_data: offchain_data: BoundedVec<u8, NFTOffchainDataLimit>, royalty: Permill, collection_id: Option<CollectionId>, is_soulbound: bool);
 
 
   /// Interface Id: TIP501-03
   /// Description: This interface is called by each of the TEE enclaves to confirm receipt of secret share for a given NFT. When all enclaves from a cluster confirm receipt of threshold shares, the secret NFT status goes to 'Minted', after which it can be transferred or listed on marketplace. This is a private interface available only for the enclaves to use
   /// Constraint(s): Refer to section 'Rules'
-  
   secret_share_received_for_nft(NFTId nft_id, uint32 enclave_id)
-
-  /// Interface Id: TIP501-04
-  /// Description: This interface transfers the NFT from one account to another account.
-  /// Constraint(s): None
-
-  transfer_nft(NFTId nft_id, AccountId destination_account)
-
-  /// Interface Id: TIP501-05
-  /// Description: This interface removes an NFT from storage.This operation is irreversible.
-  /// Constraint(s): Same as for Basic NFT
-
-  burn_nft(NFTId nft_id)
-
-  /// Interface Id: TIP501-06
-  /// Description: This interface lists an NFT on a marketplace for sale at the specified price.
-  /// Constraint(s): Same as for Basic NFT
-
-  list_nft(NFTId nft_id, Balance price, MarketplaceId marketplace_id)
-
-  /// Interface Id: TIP501-07
-  /// Description: This interface unlists an NFT from a marketplace.
-  /// Constraint(s): Same as for Basic NFT
-
-  unlist_nft(NFTId nft_id)
-
-  /// Interface Id: TIP501-08
-  /// Description: This interface allows an account to buy an NFT from a marketplace
-  /// Constraint(s): Same as for Basic NFT
-
-  buy_nft(NFTId nft_id)  
-
 }
 
 ```
-
 ### Rules and constraints
 
 #### convert_basic_to_secret_nft
