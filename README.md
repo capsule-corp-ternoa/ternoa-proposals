@@ -1,4 +1,4 @@
-# Ternoa Proposals (TSPs & TIPs)
+# Ternoa Proposals (TIPs & TSPs)
 
 ## What is a TIP?
 
