@@ -40,7 +40,7 @@ interface {
   /// Interface Id: TIP501-01
   /// Description: User can convert an existing Basic NFT into a Secret NFT
   /// Constraint(s): Refer to section 'Rules'
-  convert_to_secret(nft_id: NFTId, secret_offchain_data: offchain_data: BoundedVec<u8, NFTOffchainDataLimit>);
+  add_secret(nft_id: NFTId, secret_offchain_data: offchain_data: BoundedVec<u8, NFTOffchainDataLimit>);
   
   /// Interface Id: TIP501-02
   /// Description: User can directly create an on-chain Secret NFT
