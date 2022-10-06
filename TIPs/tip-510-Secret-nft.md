@@ -51,7 +51,7 @@ interface {
   /// Interface Id: TIP501-03
   /// Description: This interface is called by each of the TEE enclaves to confirm receipt of secret share for a given NFT. When all enclaves from a cluster confirm receipt of threshold shares, the secret NFT status goes to 'Minted', after which it can be transferred or listed on marketplace. This is a private interface available only for the enclaves to use
   /// Constraint(s): Refer to section 'Rules'
-  add_secret_share(NFTId nft_id, uint32 enclave_id)
+  add_secret_share(NFTId nft_id)
 }
 
 ```
@@ -64,7 +64,7 @@ interface {
 #### create_secret_nft
 - The Secret NFT when minted should initially be set to 'Pending Mint' State. Only when all the secret shares associated with the NFT have been stored in the enclaves, should the Secret NFT move to 'Minted' state.
 
-#### secret_share_received_for_nft
+#### add_secret_share
 - Only enclaves can use this interface. Not to be used by dApps or users.
 - When all the secret shares associated with a secret NFT have been confirmed to be received, then the NFT state should be changed from 'Pending Mint' to 'Minted'
 
