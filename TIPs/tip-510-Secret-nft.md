@@ -57,7 +57,7 @@ interface {
 ```
 ### Rules and constraints
 
-#### convert_basic_to_secret_nft
+#### add_secret
 - The Basic NFT should not be listed in a marketplace or delegated at the time of conversion to Secret NFT
 - The Secret NFT when minted should initially be set to 'Pending Mint' State. Only when all the secret shares associated with the NFT have been stored in the enclaves, should the Secret NFT move to 'Minted' state.
 
