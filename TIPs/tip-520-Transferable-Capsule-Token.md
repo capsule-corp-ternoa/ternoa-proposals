@@ -1,13 +1,13 @@
 ---
 tip: TIP-520
-title: TRANSFERABLE CAPSULE TOKEN
+title: Transferable Capsule Token
 version: 1.0
 category: NFT, Token
 authors: Benjamin Arthuys <benjamin@capsule-corp.io>
 created: 2022-10-06
 ---
 
-# Ternoa Improvement Proposal - TRANSFERABLE CAPSULE TOKEN (TCT)
+# Transferable Capsule Token (TCT)
 
 ## Simple Summary
 
