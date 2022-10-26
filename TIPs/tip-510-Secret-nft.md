@@ -126,7 +126,7 @@ The enclave program should run within a TEE environment with the following chara
 
 * User can mint a secret NFT directly
 * User can convert a Basic NFT to secret NFT
-* Owner can decrypt and view the secret associated the the secret NFT
+* Owner can decrypt and view the secret associated the secret NFT
 * User can list secret NFT in the marketplace
 * User can trade secret NFT in any marketplace
  

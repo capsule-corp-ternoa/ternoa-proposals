@@ -64,7 +64,17 @@ metadata example
 ## End-to-end workflows (Ternoa-specific)
 
 ## Test cases
+
+- User **SHOULD** mint a TCT directly
+- Owner **SHOULD** convert a Basic NFT to TCT
+- Owner **SHOULD** decrypt content data associated with the TCT
+- Owner **SHOULD** transfer a TCT using tansmission protocols
+- Owner **SHOULD NOT** transfer a TCT wihtout using transmission protocols
+- Owner **SHOULD NOT** list TCT in the marketplace
+- Owner **SHOULD NOT** trade TCT in any marketplace
  
 ## References
 
 ## Copyright
+
+Copyright and related rights waived via CC0.
