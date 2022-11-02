@@ -13,7 +13,6 @@
 
 ## Simple Summary
 
-NFTs represent proof of ownership on the blockchain. Creators need a way to group NFTs in a higher order entity. This entity is a collection. If a collection is created, NFTs can be put in it at its creation or after.
 NFTs represent proof of ownership on the blockchain. Marketplaces are entities used, primarily, to sell and buy NFTs. A marketplace's ownership and rules are also defined by the chain.
 
 ## Abstract
