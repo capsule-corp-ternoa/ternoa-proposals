@@ -42,7 +42,9 @@ Additionally if extensions are included, NFTs can have the following additional 
 ### External interfaces
 
 __Basic NFT__ should support the following onchain interfaces:
-```
+
+```rust
+
 interface {
 
   /// Interface Id: TIP100-01
@@ -96,18 +98,22 @@ However, the interface for ```create_nft``` in this TIP includes parameters for 
 ## Metadata
 
 The metadata structure for a __Basic NFT__ has been adopted from ERC-1155, and can have the following (suggested) format:
-```
+
+```json
+
 {
-2   "title":"",
-3   "description":"",
-4   "image":"",
-5   "properties":{
-6      "media":{
-7         "hash":"media hash",
-8         "type":"Type of media (file format)",
-9         "size":"size of the encrypted media"
-10      }
-11   }
+  "title":"",
+  "description":"",
+  "image":"",
+  "properties":{
+    "media":{
+      "hash":"media hash",
+      "type":"Type of media (file format)",
+      "size":"size of the encrypted media"
+    }
+  }
+}
+
 ```
 
 ## End-to-end workflow (Ternoa-specific)
