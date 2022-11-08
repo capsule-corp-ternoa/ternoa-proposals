@@ -1,15 +1,13 @@
+---
+tip: TIP-100
+title: Basic NFT
+version: 0.1.1 [![GitHub version](https://badge.fury.io/gh/Naereen%2FStrapDown.js.svg)](https://github.com/Naereen/StrapDown.js)
+category: NFT
+authors: Prabhu Eshwarla
+created: 2022-09-14
+---
+
 # Ternoa Improvement Proposal - __Basic NFTs__
-
-| Author(s)      | Prabhu Eshwarla |
-| ----------- | ----------- |
-| Created   | 14 Sep 2022       |
-| TIP Number   | TIP-100       |
-| Version   | v0.1       |
-| Requires   |       |
-| Status | Draft       |
-| Category   | NFT       |
-| Discussions-To   | https://github.com/capsule-corp-ternoa/ternoa-hub/discussions     |
-
 
 ## Simple Summary
 

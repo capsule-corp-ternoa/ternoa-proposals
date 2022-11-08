@@ -8,7 +8,7 @@ created: creation date (ex: 2022-09-09)
 discussions-To: discussion link (not required)
 ---
 
-# Ternoa Improvement Proposal - Title
+# Ternoa Improvement Proposal - Feature Title
 
 ## Simple Summary
 
