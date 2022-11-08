@@ -1,15 +1,13 @@
+---
+tip: TIP-100
+title: Basic NFT
+version: 0.1.1
+category: NFT
+authors: Prabhu Eshwarla
+created: 2022-09-14
+---
+
 # Ternoa Improvement Proposal - __Basic NFTs__
-
-| Author(s)      | Prabhu Eshwarla |
-| ----------- | ----------- |
-| Created   | 14 Sep 2022       |
-| TIP Number   | TIP-100       |
-| Version   | v0.1       |
-| Requires   |       |
-| Status | Draft       |
-| Category   | NFT       |
-| Discussions-To   | https://github.com/capsule-corp-ternoa/ternoa-hub/discussions     |
-
 
 ## Simple Summary
 
@@ -44,31 +42,29 @@ Additionally if extensions are included, NFTs can have the following additional 
 ### External interfaces
 
 __Basic NFT__ should support the following onchain interfaces:
-```
+
+```rust
+
 interface {
 
   /// Interface Id: TIP100-01
   /// Description: User can create a __Basic NFT__
   /// Constraint(s): Refer to section 'Constraints'
-  
   create_nft(offchainData: Bytes, royalty: Permill, collectionId: Option<u32>, isSoulbound: bool);
   
-/// Interface Id: TIP100-02
+  /// Interface Id: TIP100-02
   /// Description: This interface transfers the NFT from one account to another account.
   /// Constraint(s): Refer to section 'Constraints'
-
   transfer_nft(nftId: u32(NFTId), recipientId: AccountId)
 
   /// Interface Id: TIP100-03
   /// Description: This interface removes an NFT from storage. This operation is irreversible.
   /// Constraint(s): Refer to section 'Constraints'
-
   burn_nft(nftId: u32 (NFTId))
 
   /// Interface Id: TIP100-04
   /// Description: This interface sets the mint fee for the NFT. This can only be changed through governance.
   /// Constraint(s): Refer to section 'Constraints'
-
   set_nft_mint_fee(fee: u128 (BalanceOf))
 
 }
@@ -98,18 +94,22 @@ However, the interface for ```create_nft``` in this TIP includes parameters for 
 ## Metadata
 
 The metadata structure for a __Basic NFT__ has been adopted from ERC-1155, and can have the following (suggested) format:
-```
+
+```json
+
 {
-2   "title":"",
-3   "description":"",
-4   "image":"",
-5   "properties":{
-6      "media":{
-7         "hash":"media hash",
-8         "type":"Type of media (file format)",
-9         "size":"size of the encrypted media"
-10      }
-11   }
+  "title":"",
+  "description":"",
+  "image":"",
+  "properties":{
+    "media":{
+      "hash":"media hash",
+      "type":"Type of media (file format)",
+      "size":"size of the encrypted media"
+    }
+  }
+}
+
 ```
 
 ## End-to-end workflow (Ternoa-specific)
