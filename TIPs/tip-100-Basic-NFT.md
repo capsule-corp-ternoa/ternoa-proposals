@@ -50,25 +50,21 @@ interface {
   /// Interface Id: TIP100-01
   /// Description: User can create a __Basic NFT__
   /// Constraint(s): Refer to section 'Constraints'
-  
   create_nft(offchainData: Bytes, royalty: Permill, collectionId: Option<u32>, isSoulbound: bool);
   
-/// Interface Id: TIP100-02
+  /// Interface Id: TIP100-02
   /// Description: This interface transfers the NFT from one account to another account.
   /// Constraint(s): Refer to section 'Constraints'
-
   transfer_nft(nftId: u32(NFTId), recipientId: AccountId)
 
   /// Interface Id: TIP100-03
   /// Description: This interface removes an NFT from storage. This operation is irreversible.
   /// Constraint(s): Refer to section 'Constraints'
-
   burn_nft(nftId: u32 (NFTId))
 
   /// Interface Id: TIP100-04
   /// Description: This interface sets the mint fee for the NFT. This can only be changed through governance.
   /// Constraint(s): Refer to section 'Constraints'
-
   set_nft_mint_fee(fee: u128 (BalanceOf))
 
 }
