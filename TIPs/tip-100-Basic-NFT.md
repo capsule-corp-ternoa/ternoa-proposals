@@ -1,7 +1,7 @@
 ---
 tip: TIP-100
 title: Basic NFT
-version: 0.1.1 [![GitHub version](https://badge.fury.io/gh/Naereen%2FStrapDown.js.svg)](https://github.com/Naereen/StrapDown.js)
+version: 0.1.1
 category: NFT
 authors: Prabhu Eshwarla
 created: 2022-09-14
