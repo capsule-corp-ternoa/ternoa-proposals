@@ -97,7 +97,7 @@ This metadata of secret NFT will be stored on IPFs, and it’s content Id (CID) 
 The following is the workflow proposed for minting secret NFTs:
 1. User selects a media or custom data for storing privately in a secret NFT.
 2. The Wallet or dApp use the Ternoa SDK to generate a key pair for each NFT.
-3. The private key of the generated keypair is used to encrypt the secret data.
+3. The public key of the generated keypair is used to encrypt the secret data.
 4. The encrypted secret data is stored on IPFS and its content id (CID) is recorded.
 5. The CID of the encrypted secret data is used to construct the offchain metadata json file
 6. The offchain metadata file is stored on IPFS, and its content id (CID) is used to trigger an extrinsic on the blockchain to mint a secret NFT.
