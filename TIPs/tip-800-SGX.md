@@ -22,11 +22,11 @@ discussions-To: discussion link (not required)
 
 ## Simple Summary
 
-Improvements for SGX
+Improvements for SGX Pallet to support on chain operations for enclave
 
 ## Abstract
 
-More details about the TIP
+
 
 ## Motivation
 
@@ -36,19 +36,25 @@ Why it's necessary for Ternoa?
 
 ### External Interfaces
 
-onchain interfaces:
-
-```rust
-interface { 
-  
-}
-```
 
 ### Existing Interfaces changed
 
 ```rust
 interface {
-  
+
+  register_enclave(origin: OriginFor<T>, api_uri: TextFormat)
+
+  assign_enclave(origin: OriginFor<T>, cluster_id: ClusterId)
+
+  unassign_enclave(origin: OriginFor<T>)
+
+  update_enclave(origin: OriginFor<T>, api_uri: TextFormat)
+
+  change_enclave_owner(origin: OriginFor<T>, new_owner: <T::Lookup as StaticLookup>::Source)
+
+  create_cluster(origin: OriginFor<T>)
+
+  remove_cluster(origin: OriginFor<T> cluster_id: ClusterId)
 }
 ```
 
@@ -69,7 +75,16 @@ metadata example
 ## End-to-end workflows (Ternoa-specific)
 
 ## Test cases
+
+* An enclave creator can register an enclave
+* An enclave creator should be able to verify RA report upon creation
+* Should store enclave metadata on chain after verification
+* Should be able to get enclave metadata
+* Should be able to unassign enclave
+* Should be able to update enclave by the creator
  
 ## References
+* TBD
 
 ## Copyright
+* TBD
