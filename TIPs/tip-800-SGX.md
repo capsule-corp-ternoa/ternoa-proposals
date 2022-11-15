@@ -42,19 +42,22 @@ Why it's necessary for Ternoa?
 ```rust
 interface {
 
-  register_enclave(origin: OriginFor<T>, api_uri: TextFormat)
 
-  assign_enclave(origin: OriginFor<T>, cluster_id: ClusterId)
+  register_enclave(origin: OriginFor<T>, ra_report: Vec<u8>, api_uri: TextFormat)
+		
+  assign_enclave(origin: OriginFor<T>, cluster_id: ClusterId, enclave_id: EnclaveId)
 
-  unassign_enclave(origin: OriginFor<T>)
+  unassign_enclave(origin: OriginFor<T>, cluster_id: ClusterId, enclave_id: EnclaveId)
 
   update_enclave(origin: OriginFor<T>, api_uri: TextFormat)
 
-  change_enclave_owner(origin: OriginFor<T>, new_owner: <T::Lookup as StaticLookup>::Source)
+  change_enclave_owner(origin: OriginFor<T>, new_owner: <T::Lookup as StaticLookup>::Source, , enclave_id: EnclaveId)
 
   create_cluster(origin: OriginFor<T>)
 
   remove_cluster(origin: OriginFor<T> cluster_id: ClusterId)
+
+  remove_enclave(origin: OriginFor<T> enclave_id: EnclaveId)
 }
 ```
 
