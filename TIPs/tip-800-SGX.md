@@ -49,9 +49,9 @@ interface {
 
   unassign_enclave(origin: OriginFor<T>, cluster_id: ClusterId, enclave_id: EnclaveId)
 
-  update_enclave(origin: OriginFor<T>, api_uri: TextFormat)
+  update_enclave(origin: OriginFor<T>, api_uri: TextFormat, enclave_id: EnclaveId, cluster_id: ClusterId)
 
-  change_enclave_owner(origin: OriginFor<T>, new_owner: <T::Lookup as StaticLookup>::Source, , enclave_id: EnclaveId)
+  change_enclave_owner(origin: OriginFor<T>, new_owner: <T::Lookup as StaticLookup>::Source, enclave_id: EnclaveId)
 
   create_cluster(origin: OriginFor<T>)
 
