@@ -1,9 +1,10 @@
+
 # Ternoa Improvement Proposal - Secret NFTs
 
-| Author(s)      | Mohsin Riaz, Amin Razavi, Prabhu Eshwarla |
+| Author(s)      | Mohsin Riaz, Amin Razavi, Prabhu Eshwarla, Ghali El Ouarzazi |
 | ----------- | ----------- |
 | Created   | 7 Sep 2022       |
-| TIP Number   | TIP501       |
+| TIP Number   | TIP-510       |
 | Version   | v0.1       |
 | Requires   | <Link to Basic NFT TIP here>       |
 | Status | Draft       |
@@ -33,62 +34,39 @@ Pending Mint -> Minted -> Burned.
 ### External interfaces
 
 Secret NFT should support the following onchain interfaces:
-
 ```rust
 interface {
 
   /// Interface Id: TIP501-01
   /// Description: User can convert an existing Basic NFT into a Secret NFT
   /// Constraint(s): Refer to section 'Rules'
-  
-  convert_basic_to_secret_nft(cid ipfs_hash, NFTId nft_id );
+  add_secret(nft_id: NFTId, secret_offchain_data: offchain_data: BoundedVec<u8, NFTOffchainDataLimit>);
   
   /// Interface Id: TIP501-02
   /// Description: User can directly create an on-chain Secret NFT
   /// Constraint(s): Refer to section 'Rules'
-
-  create_secret_nft(cid offchain_uri, Permill royalty, CollectionId collection_id?, bool is_soulbound);
+  create_secret_nft(offchain_data: BoundedVec<u8, NFTOffchainDataLimit>, secret_offchain_data: offchain_data: BoundedVec<u8, NFTOffchainDataLimit>, royalty: Permill, collection_id: Option<CollectionId>, is_soulbound: bool);
 
 
   /// Interface Id: TIP501-03
   /// Description: This interface is called by each of the TEE enclaves to confirm receipt of secret share for a given NFT. When all enclaves from a cluster confirm receipt of threshold shares, the secret NFT status goes to 'Minted', after which it can be transferred or listed on marketplace. This is a private interface available only for the enclaves to use
   /// Constraint(s): Refer to section 'Rules'
-  
-  secret_share_received_for_nft(NFTId nft_id, uint32 enclave_id)
-
-  /// Interface Id: TIP501-04
-  /// Description: This interface transfers the NFT from one account to another account.
-  /// Constraint(s): None
-
-  transfer_nft(NFTId nft_id, AccountId destination_account)
-
-  /// Interface Id: TIP501-05
-  /// Description: This interface removes an NFT from storage.This operation is irreversible.
-  /// Constraint(s): Same as for Basic NFT
-
-  burn_nft(NFTId nft_id)
-
-  /// Interface Id: TIP501-06
-  /// Description: This interface lists an NFT on a marketplace for sale at the specified price.
-  /// Constraint(s): Same as for Basic NFT
-
-  list_nft(NFTId nft_id, Balance price, MarketplaceId marketplace_id)
-
-  /// Interface Id: TIP501-07
-  /// Description: This interface unlists an NFT from a marketplace.
-  /// Constraint(s): Same as for Basic NFT
-
-  unlist_nft(NFTId nft_id)
-
-  /// Interface Id: TIP501-08
-  /// Description: This interface allows an account to buy an NFT from a marketplace
-  /// Constraint(s): Same as for Basic NFT
-
-  buy_nft(NFTId nft_id)  
-
+  add_secret_share(NFTId nft_id)
 }
 
 ```
+### Rules and constraints
+
+#### add_secret
+- The Basic NFT should not be listed in a marketplace or delegated at the time of conversion to Secret NFT
+- The Secret NFT when minted should initially be set to 'Pending Mint' State. Only when all the secret shares associated with the NFT have been stored in the enclaves, should the Secret NFT move to 'Minted' state.
+
+#### create_secret_nft
+- The Secret NFT when minted should initially be set to 'Pending Mint' State. Only when all the secret shares associated with the NFT have been stored in the enclaves, should the Secret NFT move to 'Minted' state.
+
+#### add_secret_share
+- Only enclaves can use this interface. Not to be used by dApps or users.
+- When all the secret shares associated with a secret NFT have been confirmed to be received, then the NFT state should be changed from 'Pending Mint' to 'Minted'
 
 ### Rules and constraints
 
@@ -132,7 +110,7 @@ This metadata of secret NFT will be stored on IPFs, and it’s content Id (CID) 
 The following is the workflow proposed for minting secret NFTs:
 1. User selects a media or custom data for storing privately in a secret NFT.
 2. The Wallet or dApp use the Ternoa SDK to generate a key pair for each NFT.
-3. The private key of the generated keypair is used to encrypt the secret data.
+3. The public key of the generated keypair is used to encrypt the secret data.
 4. The encrypted secret data is stored on IPFS and its content id (CID) is recorded.
 5. The CID of the encrypted secret data is used to construct the offchain metadata json file
 6. The offchain metadata file is stored on IPFS, and its content id (CID) is used to trigger an extrinsic on the blockchain to mint a secret NFT.
