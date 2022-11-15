@@ -1,0 +1,1 @@
+# JS to Blockchain Type Mapping

@@ -4,6 +4,7 @@
 
 Ternoa Improvment Proposal - TIPs were created to provide an open source technical specification standard to share resources with the Ternoa's community. The TIPs are suggested references to the Ternoa ecosystem and more generally to Substrate, the Polkadot framework. TIPs are intended to evolve continuously in order to meet the standards of the expanding market.
 
+
 ## What is a TSP?
 
 Ternoa Standard Proposal - TSP is a standard document that provide technical specifications and detailled explanations of an implemented feature on Ternoa.
@@ -21,3 +22,4 @@ To suggest a proposal, you can create a Pull Request with your new proposal as a
 
 ## Key words for use in TIPs to Indicate Requirement Levels
 [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) must be followed in TIPs that use words that represents obligations or advices.
+

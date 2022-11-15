@@ -68,6 +68,19 @@ interface {
 - Only enclaves can use this interface. Not to be used by dApps or users.
 - When all the secret shares associated with a secret NFT have been confirmed to be received, then the NFT state should be changed from 'Pending Mint' to 'Minted'
 
+### Rules and constraints
+
+#### convert_basic_to_secret_nft
+- The Basic NFT should not be listed in a marketplace or delegated at the time of conversion to Secret NFT
+- The Secret NFT when minted should initially be set to 'Pending Mint' State. Only when all the secret shares associated with the NFT have been stored in the enclaves, should the Secret NFT move to 'Minted' state.
+
+#### create_secret_nft
+- The Secret NFT when minted should initially be set to 'Pending Mint' State. Only when all the secret shares associated with the NFT have been stored in the enclaves, should the Secret NFT move to 'Minted' state.
+
+#### secret_share_received_for_nft
+- Only enclaves can use this interface. Not to be used by dApps or users.
+- When all the secret shares associated with a secret NFT have been confirmed to be received, then the NFT state should be changed from 'Pending Mint' to 'Minted'
+
 ## Additional Info
 
 While the primary use case of Secret NFTs is to provide the ability to securely store encryption keys in TEE enclave, there can be many uses of this feature beyond encrypting NFT media. The key management and TEE enclaves system can be used to securely store any kind of data.
