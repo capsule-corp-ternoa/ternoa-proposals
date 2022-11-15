@@ -83,15 +83,15 @@ interface {
 
 ```
 
-### Blockchain Interfaces
+### Blockchain Interfaces (SGX-Pallet)[TIP-800]
 
 ``` javascript
 
 // Add an enclave on blockchain
 RegisterEnclave(bytes enclave_ias_report, bytes encalve_url);
 
-// Remove and enclave from blockchain
-UnregisterEnclave(bytes )
+// Remove an enclave from blockchain
+UnregisterEnclave(bytes encalve_url)
 
 ```
 
@@ -116,8 +116,8 @@ TBD (if this section is relevant for TEE)
 TBD
 
 ## Test cases
-- Wallet/SDK stores secret-share to an encalve with success report
-- Wallet/SDK changes secret-share on encalve with success report
+- Wallet/SDK stores secret-share to an encalve 
+- Wallet/SDK changes secret-share on encalve 
 - Wallet/SDK retrieves stored secret-share from enclave
 
 - Wallet/SDK stores secret-share to cluster with success reports
