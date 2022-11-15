@@ -57,7 +57,7 @@ interface {
 
   remove_cluster(origin: OriginFor<T> cluster_id: ClusterId)
 
-  remove_enclave(origin: OriginFor<T> enclave_id: EnclaveId)
+  remove_enclave(origin: OriginFor<T>, cluster_id: ClusterId, enclave_id: EnclaveId)
 }
 ```
 
