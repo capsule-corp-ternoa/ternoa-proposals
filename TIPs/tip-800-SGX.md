@@ -1,23 +1,12 @@
----
-tip: tip_800
-title: 
-version: 
-category: NFT/Token/Blockchain
-authors: Name <email@email.com>
-created: creation date (ex: 2022-09-09)
-discussions-To: discussion link (not required)
----
-
 # Ternoa Improvement Proposal - SGX Pallet
 
-| Author(s)      | Tapioca Boy |
+| Author(s)      |  |
 | ----------- | ----------- |
 | Created   | 15 Nov 2022       |
 | TIP Number   | TIP-800       |
 | Version   | v0.1       |
-| Requires   | <Link to Basic NFT TIP here>       |
 | Status | In Progress       |
-| Category   | Blockchain       |
+| Category   | Blockchain, SGX       |
 | Discussions-To   | https://github.com/capsule-corp-ternoa/ternoa-hub/discussions
 
 ## Simple Summary
