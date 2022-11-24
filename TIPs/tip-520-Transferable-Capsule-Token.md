@@ -43,7 +43,31 @@ interface {
 
 ```rust
 interface {
+  /// Interface Id: TIP520-01
+  /// Description: User can convert an existing basic NFT into a Capsule NFT
+  /// Constraint(s): Refer to section 'Rules'
+  convert_to_capsule(nft_id: NFTId, capsule_offchain_data: BoundedVec<u8, NFTOffchainDataLimit>);
   
+  /// Interface Id: TIP520-02
+  /// Description: User can directly create an on-chain Secret NFT
+  /// Constraint(s): Refer to section 'Rules'
+  create_capsule(offchain_data: BoundedVec<u8, NFTOffchainDataLimit>, capsule_offchain_data: BoundedVec<u8, NFTOffchainDataLimit>, royalty: Permill, collection_id: Option<CollectionId>, is_soulbound: bool);
+
+  /// Interface Id: TIP520-03
+  /// Description: User can set the capsule's offchain data. Note that capsules are mutable unlike secret NFTs
+  /// Constraint(s): Refer to section 'Rules'
+  set_capsule_offchaindata(nft_id: NFTId, capsule_offchain_data: BoundedVec<u8, NFTOffchainDataLimit>)
+
+  /// Interface Id: TIP520-04
+  /// Description: Capsule mint fee can be changed through governance
+  /// Constraint(s): Refer to section 'Rules'
+  set_capsule_mint_fee(fee: u128 (BalanceOf))
+
+  /// Interface Id: TIP520-05
+  /// Description: This interface is called by each of the TEE enclaves to confirm receipt of secret share for a given Capsule NFT. When all enclaves from a cluster confirm receipt of threshold shares, the Capsule NFT status goes to 'Minted', after which it can be transferred through a transmission protocol. This is a private interface available only for the enclaves to use
+
+  /// Constraint(s): Refer to section 'Rules'
+  add_secret_share(NFTId nft_id)
 }
 ```
 
@@ -53,55 +77,53 @@ interface {
 
 ## Metadata
 
-metadata example
-
-```json
+The Capsule NFT is an extension of the Basic NFT. The Basic NFT has its own metadata that is stored in json format in IPFS. 
+The format for the offchain metadata of Capsule NFT is suggested here:
+```
 {
-	
+   "title":"(Optional) This the title of the Capsule NFT",
+   "description":"(Optional) Description of the Capsule NFT",
+   "properties":{
+      "encrypted_media":[{
+        
+         "hash":"media hash",
+         "type":"Type of media (file format)",
+         "size":"size of the encrypted media"
+        
+      }],
+      "public_key_of_nft": "(Optional) public key associated with the Capsule NFT",
+   }
 }
 ```
+This metadata of capsule NFT will be stored on IPFs, and it’s content Id (CID) will be stored onchain.
 
 ## End-to-end workflows (Ternoa-specific)
 
-**TCT Minting Workflow:**
+**Capsule Minting Workflow:**
 
-1. User selects data for storing privately in a TCT.
-2. The Wallet or dApp use the Ternoa SDK to generate a key pair for each TCT.
-3. The private key of the generated keypair is used to encrypt data.
-4. The encrypted data are stored on IPFS and its content id (CID) is recorded.
-5. The CID of the encrypted data is used to construct the offchain metadata json file
-6. The offchain metadata file is stored on IPFS, and its content id (CID) is used to trigger an extrinsic on the blockchain to mint a TCT.
-7. The id of the new TCT is obtained from the blockchain by the wallet/Dapp using Ternoa SDK. 
-8. The secret key used to encrypt the data is split into shares using a threshold secret scheme (such as Shamir Secret Shares). 
-9. Discovery of enclave locations (TBD)
-9. Each threshold share is then stored on a different enclave along with the associated TCT id. The number of threshold shares of the encryption key should be equal to the number of TEE enclaves running as offchain components.
-10. Each TEE enclaves then posts a transaction on the blockchain confirming receipt of the secret share for a given TCT.
+1. User selects data for storing privately in a Capsule.
+2. The Wallet or dApp encrypts the data with an encrypption key and uploads to IPFS
+3. The Wallet/dApp mints Capsule NFT on-chain
+4. The Wallet/dApp creates secret shares from encryption key, and stores the secret shares on Ternoa TEE enclaves
+5. The TEE enclaves confirm receipt of shares for Capsule, by triggering extrinsics on blockchain.
+6. The status of capsule NFT changes to 'Minted'. The capsule is now ready to be associated with a transmission protocol.
 
-**TCT Displaying Workflow (Owner View)**
+**Capsule displaying Workflow (Owner View)**
 
 1. User requests the wallet or dApp to decrypt data associated with the TCT owned by them.
-2. The wallet/dApp sends a request to each enclave with a signature generated from the user's account key, asking for the secret share associated with a given TCT.
-3. The TEE enclave verifies if the requestor of the secret share is the owner of the TCT. Invalid requests are rejected. If the ownership is successfully verified from the blockchain, the secret share is sent to the requesting wallet/dApp.
-4. The wallet/dApp receives the minimum threshold of shares from the set of available enclaves, and  reconstructs the encryption key for the secret. 
-5. The encryption key is used to retrieve the original secret from IPFs which is then displayed to the user.
+2. The wallet/dApp retrieves the secret shares from the enclaves and reconstructs the decryption key.
+3. The Wallet/dApp retrieves the capsule media from IPFs, decrypts it and displays the data/media to user. Only owners of the capsule can view the data associated with the capsule.
 
-**The enclave program should run within a TEE environment with the following characteristics:**
-
-1. The enclave program is deployed on a set of TEE-enabled hardware. It is recommended to have a minimum set of 5 TEE machines running in a cluster.
-2. The enclave program should support interfaces to store and retrive secrets. The details of the interfaces provided by the TEE enclave program is described later in this section.
-3. The enclave program should support remote attestation, which is a servie offered by the TEE processor vendor.
-4. Each of the TEE machines should store one of the secret shares associated with an NFT. If the TEE cluster comprises of 5 machines as recommended, there would be a set of five secret shares generated each of which is stored on one of the TEE machines through a request to the TEE enclave program.
-5. There should be a stand-by TEE cluster of 5 machines that can be manually activated if the primary TEE cluster malfunctions. There should be ability for the secret shares stored in the primary TEE cluster to be securely transferred to the backup TEE cluster, so that the secondary TEE cluster can be activated in case of contingencies.
 
 ## Test cases
 
-- User **SHOULD** mint a TCT directly
-- Owner **SHOULD** convert a Basic NFT to TCT
-- Owner **SHOULD** decrypt content data associated with the TCT
-- Owner **SHOULD** transfer a TCT using tansmission protocols
-- Owner **SHOULD NOT** transfer a TCT wihtout using transmission protocols
-- Owner **SHOULD NOT** list TCT in the marketplace
-- Owner **SHOULD NOT** trade TCT in any marketplace
+- User **should be able to** mint a TCT directly
+- Owner **should be able to** convert a Basic NFT to TCT
+- Owner **should be able to** decrypt content data associated with the TCT
+- Owner **should be able to** transfer a TCT using tansmission protocols
+- Owner **should not be able to** transfer a TCT wihtout using transmission protocols
+- Owner **should not be able to** list TCT in the marketplace
+- Owner **should not be able to** trade TCT in any marketplace
  
 ## References
 
