@@ -19,9 +19,19 @@ Improvements for SGX Pallet to support on chain operations for enclave
 
 ## Motivation
 
-Why it's necessary for Ternoa?
+Gives the ability to create clusters to hold enclaves
 
 ## Specification
+
+* Proposal for creating a cluster, removing a cluster and registering a service provider should come through the technical committee.
+
+* When adding an enclave to a cluster, it will be added to the primary cluster or the next available cluster
+* Checks the enclave provider is registered and valid
+* Checks the digital signatre of `ra_report` with the provided public key of enclave provider
+* A cluster can be forgotten or removed when there are no enclaves
+* Can unregister enclave providerIds and this will invalidates all the stored enclaved and this happens via a technical committee proposal (future implementation)
+
+
 
 ### External Interfaces
 
@@ -32,6 +42,8 @@ Why it's necessary for Ternoa?
 interface {
 
   /// Registers enclavce providers on chain :- Intel, AMD
+  /// Different manufacturers can provide different enclaves
+  /// Register's an enclave provider should come through the technical committee
   register_enclave_provider(origin: OriginFor<T>, enclave_provider: Vec<u8>)
 
   /// Given provider may have different processor architectures (enclave_class)
@@ -54,13 +66,16 @@ interface {
   update_enclave(origin: OriginFor<T>, api_uri: TextFormat, enclave_id: EnclaveId, cluster_id: ClusterId)
 
   /// Change the ownership of an enclave
-  change_enclave_owner(origin: OriginFor<T>, new_owner: <T::Lookup as StaticLookup>::Source, enclave_id: EnclaveId)
+  change_enclave_owner(origin: OriginFor<T>, prev_owner: <T::Lookup as StaticLookup>::Source, new_owner: <T::Lookup as StaticLookup>::Source, enclave_id: EnclaveId)
 
   /// Creates a cluster
-  /// Max  slots :- 5
+  /// A cluster can hold up to 5 enclaves
+  /// Happens via a proposal by the technical committee
   register_cluster(origin: OriginFor<T>)
 
   /// Removes a cluster
+  /// Happens via a proposal by the technical committee
+  /// Cluster must be empty
   unregister_cluster(origin: OriginFor<T> cluster_id: ClusterId)
 
   /// Removes an enclave from the system
