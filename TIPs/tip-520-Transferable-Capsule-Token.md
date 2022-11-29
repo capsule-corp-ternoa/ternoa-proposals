@@ -34,14 +34,6 @@ For all those points, Ternoa created TCT to bring a powerful solution to solve d
 onchain interfaces:
 
 ```rust
-interface { 
-  
-}
-```
-
-### Existing Interfaces changed
-
-```rust
 interface {
   /// Interface Id: TIP520-01
   /// Description: User can convert an existing basic NFT into a Capsule NFT
