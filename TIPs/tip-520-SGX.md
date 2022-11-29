@@ -57,16 +57,15 @@ interface {
   register_enclave(origin: OriginFor<T>, ra_report: Vec<u8>, api_uri: TextFormat)
 		
   /// Assigns a clusterId for an enclave
+  /// Mandate call and make an update 
   assign_enclave(origin: OriginFor<T>, cluster_id: ClusterId, enclave_id: EnclaveId)
-
-  /// UnAssign a clusterId from an enclave
-  unassign_enclave(origin: OriginFor<T>, cluster_id: ClusterId, enclave_id: EnclaveId)
 
   ///  Updates metadata for an enclave
   update_enclave(origin: OriginFor<T>, api_uri: TextFormat, enclave_id: EnclaveId, cluster_id: ClusterId)
 
   /// Change the ownership of an enclave
-  change_enclave_owner(origin: OriginFor<T>, prev_owner: <T::Lookup as StaticLookup>::Source, new_owner: <T::Lookup as StaticLookup>::Source, enclave_id: EnclaveId)
+  /// 
+  change_enclave_operator(origin: OriginFor<T>, prev_owner: <T::Lookup as StaticLookup>::Source, new_operator: <T::Lookup as StaticLookup>::Source, enclave_id: EnclaveId)
 
   /// Creates a cluster
   /// A cluster can hold up to 5 enclaves
