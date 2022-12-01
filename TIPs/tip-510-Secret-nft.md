@@ -40,18 +40,24 @@ interface {
   /// Interface Id: TIP501-01
   /// Description: User can convert an existing Basic NFT into a Secret NFT
   /// Constraint(s): Refer to section 'Rules'
-  add_secret(nft_id: NFTId, secret_offchain_data: offchain_data: BoundedVec<u8, NFTOffchainDataLimit>);
+  add_secret(nft_id: NFTId, secret_offchain_data: BoundedVec<u8, NFTOffchainDataLimit>);
   
   /// Interface Id: TIP501-02
   /// Description: User can directly create an on-chain Secret NFT
   /// Constraint(s): Refer to section 'Rules'
-  create_secret_nft(offchain_data: BoundedVec<u8, NFTOffchainDataLimit>, secret_offchain_data: offchain_data: BoundedVec<u8, NFTOffchainDataLimit>, royalty: Permill, collection_id: Option<CollectionId>, is_soulbound: bool);
+  create_secret_nft(offchain_data: BoundedVec<u8, NFTOffchainDataLimit>, secret_offchain_data: BoundedVec<u8, NFTOffchainDataLimit>, royalty: Permill, collection_id: Option<CollectionId>, is_soulbound: bool);
 
 
   /// Interface Id: TIP501-03
   /// Description: This interface is called by each of the TEE enclaves to confirm receipt of secret share for a given NFT. When all enclaves from a cluster confirm receipt of threshold shares, the secret NFT status goes to 'Minted', after which it can be transferred or listed on marketplace. This is a private interface available only for the enclaves to use
   /// Constraint(s): Refer to section 'Rules'
   add_secret_share(NFTId nft_id)
+
+  /// Interface Id: TIP501-04
+  /// Description: Secret NFT mint fee can be changed through governance
+  /// Constraint(s): Refer to section 'Rules'
+  set_secret_nft_mint_fee(fee: u128 (BalanceOf))
+
 }
 
 ```
@@ -139,7 +145,7 @@ The enclave program should run within a TEE environment with the following chara
 
 * User can mint a secret NFT directly
 * User can convert a Basic NFT to secret NFT
-* Owner can decrypt and view the secret associated the the secret NFT
+* Owner can decrypt and view the secret associated the secret NFT
 * User can list secret NFT in the marketplace
 * User can trade secret NFT in any marketplace
  
