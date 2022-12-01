@@ -43,7 +43,7 @@ interface {
 
   /// Registers enclavce providers on chain :- Intel, AMD
   /// Different manufacturers can provide different enclaves
-  /// Register's an enclave provider should come through the technical committee
+  /// Register's an enclave provider should come through the mandate call
   register_enclave_provider(origin: OriginFor<T>, enclave_provider: Vec<u8>)
 
   /// Given provider may have different processor architectures (enclave_class)
@@ -69,11 +69,11 @@ interface {
 
   /// Creates a cluster
   /// A cluster can hold up to 5 enclaves
-  /// Happens via a proposal by the technical committee
+  /// Mandate call
   register_cluster(origin: OriginFor<T>)
 
   /// Removes a cluster
-  /// Happens via a proposal by the technical committee
+  /// Mandate call
   /// Cluster must be empty
   unregister_cluster(origin: OriginFor<T> cluster_id: ClusterId)
 
