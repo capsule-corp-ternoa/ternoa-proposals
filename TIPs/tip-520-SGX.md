@@ -79,6 +79,12 @@ interface {
 
   /// Removes an enclave from the system
   remove_enclave(origin: OriginFor<T>, cluster_id: ClusterId, enclave_id: EnclaveId)
+
+  /// Secret NFT pallet needs to provide and interface to confirm 
+  ///if an account belongs to SGX machine.
+  ensure_enclave(sgx_account: T::Account) 
+  // return None if there is no accoiunt or else returns cluster_id, enclave_id
+
 }
 ```
 
