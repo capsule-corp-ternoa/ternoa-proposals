@@ -40,32 +40,49 @@ Gives the ability to create clusters to hold enclaves
 
 ```rust
 interface {
+  /// Register an enclave, parse ra_report and performs validations
+  /// Origin :- Operator Account Address
+  /// enclave_address :- Generated within each enclave (PK)
+  /// Signed by operator (the origin)
+  ///   Notes:
+  /// Enclave should have public endpoints to return:
+  ///     1. Simple health check - 200
+  ///     2. Binary hash
+  ///     3. Quote
+  ///     4. Enclave address & operator address
+  /// This transaction will be signed by operator.
+  /// Verify if the origin does not already have an enclave address associated with it.
+  register_enclave(origin: OriginFor<T>, enclave_address: Vec<u8>, api_uri: Vec<u8>)
+
+  /// Removes an enclave from the system
+  /// Origin- operator account address
+  /// If the enclave is assigned, he will be placed in queue for tech committee approval
+  /// If enclave is not already assigned, he can exit without permission.
+  unregister_enclave(origin: OriginFor<T>)
+
+  /// Removes an enclave from the system
+  /// Origin- operator account address
+  /// If the enclave is assigned, he will be placed in queue for tech committee approval
+  /// If enclave is not already assigned, he can exit without permission.
+  update_registration(origin: OriginFor<T>, enclave_id: EnclaveId)
 
   /// Registers enclavce providers on chain :- Intel, AMD
   /// Different manufacturers can provide different enclaves
   /// Register's an enclave provider should come through the mandate call
   register_enclave_provider(origin: OriginFor<T>, enclave_provider: Vec<u8>)
 
-  /// Given provider may have different processor architectures (enclave_class)
-  /// and for a given enclave class there can be different public keys
-  register_provider_keys(origin: OriginFor<T>, enclave_provider: Vec<u8>, enclave_class: Vec<u8>, provider_public_key: Vec<u8>)
-
-  /// Registers an account which responsible for creating / submitting an enclave report
-  register_enclave_operator(origin: OriginFor<T>, operator: <T::Lookup as StaticLookup>::Source,)
-
-  /// Register an enclave, parse ra_report and performs validations
-  register_enclave(origin: OriginFor<T>, ra_report: Vec<u8>, api_uri: TextFormat)
-		
   /// Assigns a clusterId for an enclave
-  /// Mandate call and make an update 
-  assign_enclave(origin: OriginFor<T>, cluster_id: ClusterId, enclave_id: EnclaveId)
+  /// Tech committee proposal:
+  assign_enclave(cluster_id: ClusterId, enclave_address: Vec<u8>, enclave_id: EnclaveId)
 
-  ///  Updates metadata for an enclave
-  update_enclave(origin: OriginFor<T>, api_uri: TextFormat, enclave_id: EnclaveId, cluster_id: ClusterId)
+  /// Origin :- Operator Account
+  /// Performs all cleanup
+  unassign_enclave(Origin, enclave id)
 
-  /// Change the ownership of an enclave
-  /// 
-  change_enclave_operator(origin: OriginFor<T>, prev_owner: <T::Lookup as StaticLookup>::Source, new_operator: <T::Lookup as StaticLookup>::Source, enclave_id: EnclaveId)
+  /// Force update enclave
+  /// Technical committee call
+  force_update_enclave(enclave_id: EnclaveId, enclave_address: Vec<u8>, api_url: Vec<u8>)
+
 
   /// Creates a cluster
   /// A cluster can hold up to 5 enclaves
@@ -77,13 +94,17 @@ interface {
   /// Cluster must be empty
   unregister_cluster(origin: OriginFor<T> cluster_id: ClusterId)
 
-  /// Removes an enclave from the system
-  remove_enclave(origin: OriginFor<T>, cluster_id: ClusterId, enclave_id: EnclaveId)
-
   /// Secret NFT pallet needs to provide and interface to confirm 
   ///if an account belongs to SGX machine.
-  ensure_enclave(sgx_account: T::Account) 
-  // return None if there is no accoiunt or else returns cluster_id, enclave_id
+  /// return None if there is no accoiunt or else returns cluster_id, enclave_id
+  ensure_enclave(sgx_account: T::Account)
+
+  /// Given provider may have different processor architectures (enclave_class)
+  /// and for a given enclave class there can be different public keys
+  register_provider_keys(origin: OriginFor<T>, enclave_provider: Vec<u8>, enclave_class: Vec<u8>, provider_public_key: Vec<u8>)
+
+  /// Registers an account which responsible for creating / submitting an enclave report
+  register_enclave_operator(origin: OriginFor<T>, operator: <T::Lookup as StaticLookup>::Source,)
 
 }
 ```
