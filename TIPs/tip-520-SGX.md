@@ -66,11 +66,6 @@ interface {
   /// If enclave is not already assigned, he can exit without permission.
   update_registration(origin: OriginFor<T>, enclave_id: EnclaveId)
 
-  /// Registers enclavce providers on chain :- Intel, AMD
-  /// Different manufacturers can provide different enclaves
-  /// Register's an enclave provider should come through the mandate call
-  register_enclave_provider(origin: OriginFor<T>, enclave_provider: Vec<u8>)
-
   /// Assigns a clusterId for an enclave
   /// Tech committee proposal:
   assign_enclave(cluster_id: ClusterId, enclave_address: Vec<u8>, enclave_id: EnclaveId)
@@ -98,13 +93,6 @@ interface {
   ///if an account belongs to SGX machine.
   /// return None if there is no accoiunt or else returns cluster_id, enclave_id
   ensure_enclave(sgx_account: T::Account)
-
-  /// Given provider may have different processor architectures (enclave_class)
-  /// and for a given enclave class there can be different public keys
-  register_provider_keys(origin: OriginFor<T>, enclave_provider: Vec<u8>, enclave_class: Vec<u8>, provider_public_key: Vec<u8>)
-
-  /// Registers an account which responsible for creating / submitting an enclave report
-  register_enclave_operator(origin: OriginFor<T>, operator: <T::Lookup as StaticLookup>::Source,)
 
 }
 ```
