@@ -1,7 +1,7 @@
 ---
 tip: TIP-510
 title: Secret NFT
-version: 0.1
+version: 0.2
 status: DRAFT
 category: NFT
 authors: Mohsin Riaz, Amin Razavi, Prabhu Eshwarla, Ghali El Ouarzazi, Benjamin Arthuys
@@ -45,7 +45,6 @@ interface {
   /// Description: User can directly create an on-chain Secret NFT
   /// Constraint(s): Refer to section 'Rules'
   create_secret_nft(offchain_data: BoundedVec<u8, NFTOffchainDataLimit>, secret_offchain_data: BoundedVec<u8, NFTOffchainDataLimit>, royalty: Permill, collection_id: Option<CollectionId>, is_soulbound: bool);
-
 
   /// Interface Id: TIP501-03
   /// Description: This interface is called by each of the TEE enclaves to confirm receipt of secret share for a given NFT. When all enclaves from a cluster confirm receipt of threshold shares, the secret NFT status goes to 'Minted', after which it can be transferred or listed on marketplace. This is a private interface available only for the enclaves to use
