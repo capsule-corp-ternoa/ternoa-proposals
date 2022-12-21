@@ -4,7 +4,7 @@ title: Secret NFT
 version: 0.2
 status: DRAFT
 category: NFT
-authors: Mohsin Riaz, Amin Razavi, Prabhu Eshwarla, Ghali El Ouarzazi, Benjamin Arthuys
+authors: Mohsin Riaz, Amin Razavi, Prabhu Eshwarla, Ghali El Ouarzazi
 created: 2022-09-07
 ---
 
