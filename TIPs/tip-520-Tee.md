@@ -1,4 +1,4 @@
-# Ternoa Improvement Proposal - SGX Pallet
+# Ternoa Improvement Proposal - TEE Pallet
 
 | Author(s)      |  |
 | ----------- | ----------- |
@@ -6,12 +6,12 @@
 | TIP Number   | TIP-520       |
 | Version   | v0.1       |
 | Status | In Progress       |
-| Category   | Blockchain, SGX       |
+| Category   | Blockchain, TEE       |
 | Discussions-To   | https://github.com/capsule-corp-ternoa/ternoa-hub/discussions
 
 ## Simple Summary
 
-Improvements for SGX Pallet to support on chain operations for enclave
+Improvements for TEE Pallet to support on chain operations for enclave
 
 ## Abstract
 
