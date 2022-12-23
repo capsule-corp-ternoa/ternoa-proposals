@@ -1,5 +1,5 @@
 ---
-tip: TIP-520
+tip: TIP-530
 title: Transferable Capsule Token
 version: 1.0
 category: NFT, Token
