@@ -111,6 +111,7 @@ The metadata structure for a __Basic NFT__ has been adopted from ERC-1155, and c
 }
 
 ```
+moreover, in the properties object, nft creator can add additional properties or attributes
 
 ## End-to-end workflow (Ternoa-specific)
 
