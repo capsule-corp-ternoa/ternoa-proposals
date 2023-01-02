@@ -98,19 +98,20 @@ The metadata structure for a __Basic NFT__ has been adopted from ERC-1155, and c
 ```json
 
 {
-  "title":"",
-  "description":"",
-  "image":"",
+  "title":"", //text
+  "description":"", //text
+  "image":"", //IPFS CID or complete getable URL
   "properties":{
     "media":{
-      "hash":"media hash",
+      "hash":"media IPFS CID",
       "type":"Type of media (file format)",
-      "size":"size of the encrypted media"
+      "size":"size of the media"
     }
   }
 }
 
 ```
+moreover, in the properties object, nft creator can add additional properties or attributes
 
 ## End-to-end workflow (Ternoa-specific)
 
