@@ -40,60 +40,63 @@ Gives the ability to create clusters to hold enclaves
 
 ```rust
 interface {
-  /// Register an enclave, parse ra_report and performs validations
-  /// Origin :- Operator Account Address
+  /// Ask for registration of an enclave
+  /// Origin : operator Account Address
   /// enclave_address :- Generated within each enclave (PK)
   /// Signed by operator (the origin)
-  ///   Notes:
+  /// Notes:
   /// Enclave should have public endpoints to return:
   ///     1. Simple health check - 200
   ///     2. Binary hash
   ///     3. Quote
   ///     4. Enclave address & operator address
-  /// This transaction will be signed by operator.
-  /// Verify if the origin does not already have an enclave address associated with it.
+  /// One operator can have one enclave.
   register_enclave(origin: OriginFor<T>, enclave_address: Vec<u8>, api_uri: Vec<u8>)
 
-  /// Removes an enclave from the system
-  /// Origin- operator account address
+  /// Removes an enclave from the system OR ask for removal if the enclave is assigned
+  /// Origin : operator account address
   /// If the enclave is assigned, he will be placed in queue for tech committee approval
-  /// If enclave is not already assigned, he can exit without permission.
+  /// If the enclave is not already assigned, he can exit without permission.
   unregister_enclave(origin: OriginFor<T>)
-
-  /// Removes an enclave from the system
-  /// Origin- operator account address
+  
+  /// Ask for update of the enclave fields
+  /// Origin : operator account address
+  /// If the enclave is not assigned, should trigger an error
   /// If the enclave is assigned, he will be placed in queue for tech committee approval
-  /// If enclave is not already assigned, he can exit without permission.
-  update_registration(origin: OriginFor<T>, enclave_id: EnclaveId)
-
-  /// Assigns a clusterId for an enclave
-  /// Tech committee proposal:
-  assign_enclave(cluster_id: ClusterId, enclave_address: Vec<u8>, enclave_id: EnclaveId)
-
-  /// Origin :- Operator Account
+  /// Notes:
+  /// Enclave should have public endpoints to return:
+  ///     1. Simple health check - 200
+  ///     2. Binary hash
+  ///     3. Quote
+  ///     4. Enclave address & operator address
+  ///     5. Enclave should have backup of all the secret shares (in case the operator changes machine)
+  update_enclave(origin: OriginFor<T>, enclave_address: Vec<u8>, api_uri: Vec<u8>)
+  
+  /// Assigns an EnclaveId to a cluster
+  /// Origin : Root
+  assign_enclave(origin: OriginFor<T>, operator: Account, cluster_id: ClusterId)
+  
+  /// Remove a registration from the registration list (not assigned)
+  /// Origin : Root
+  remove_registration(origin: OriginFor<T>, operator: Account)
+  
+  /// Origin : Root
   /// Performs all cleanup
-  unassign_enclave(Origin, enclave id)
+  remove_enclave(Origin, enclave_id)
 
   /// Force update enclave
-  /// Technical committee call
+  /// Origin : Root
   force_update_enclave(enclave_id: EnclaveId, enclave_address: Vec<u8>, api_url: Vec<u8>)
 
-
   /// Creates a cluster
+  /// Origin : Root
   /// A cluster can hold up to 5 enclaves
-  /// Mandate call
-  register_cluster(origin: OriginFor<T>)
+  create_cluster(origin: OriginFor<T>)
 
   /// Removes a cluster
-  /// Mandate call
+  /// Origin : Root
   /// Cluster must be empty
-  unregister_cluster(origin: OriginFor<T> cluster_id: ClusterId)
-
-  /// Secret NFT pallet needs to provide and interface to confirm 
-  ///if an account belongs to SGX machine.
-  /// return None if there is no accoiunt or else returns cluster_id, enclave_id
-  ensure_enclave(sgx_account: T::Account)
-
+  remove_cluster(origin: OriginFor<T> cluster_id: ClusterId)
 }
 ```
 
