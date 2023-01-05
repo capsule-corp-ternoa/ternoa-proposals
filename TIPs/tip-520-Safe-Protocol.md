@@ -1,4 +1,4 @@
-# Ternoa Improvement Proposal - TEE Pallet
+# Ternoa Improvement Proposal - Safe Protocol
 
 | Author(s)      |  |
 | ----------- | ----------- |
@@ -11,7 +11,7 @@
 
 ## Simple Summary
 
-Improvements for TEE Pallet to support on chain operations for enclave
+Improvements for Safe Protocol to support on chain operations for enclave
 
 ## Abstract
 
