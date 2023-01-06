@@ -72,6 +72,10 @@ interface {
   ///     5. Enclave should have backup of all the secret shares (in case the operator changes machine)
   update_enclave(origin: OriginFor<T>, enclave_address: Vec<u8>, api_uri: Vec<u8>)
   
+  /// Cancels an update request
+  /// Origin : operator account address
+  cancel_update(origin: OriginFor<T>)
+  
   /// Assigns an EnclaveId to a cluster
   /// Origin : Root
   assign_enclave(origin: OriginFor<T>, operator: Account, cluster_id: ClusterId)
@@ -80,13 +84,17 @@ interface {
   /// Origin : Root
   remove_registration(origin: OriginFor<T>, operator: Account)
   
+  /// Remove an update request from the update list (assigned)
+  /// Origin : Root
+  remove_update(origin: OriginFor<T>, operator: Account)
+  
   /// Origin : Root
   /// Performs all cleanup
   remove_enclave(Origin, enclave_id)
 
   /// Force update enclave
   /// Origin : Root
-  force_update_enclave(enclave_id: EnclaveId, enclave_address: Vec<u8>, api_url: Vec<u8>)
+  force_update_enclave(origin: OriginFor<T>, operator: Account, enclave_address: Account, api_url: Vec<u8>)
 
   /// Creates a cluster
   /// Origin : Root
