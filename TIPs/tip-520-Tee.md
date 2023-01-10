@@ -112,6 +112,16 @@ interface {
 
 ## Additional Info
 
+### How to Sync:
+
+`isSyncing` is set to `true` by default. Here are the steps to be sure you can sync your secret NFTs to enclaves:
+
+1. Submit a new proposal to tech committee to create a cluster using “tee” pallet: PROPOSAL: tee > `createCluster()`
+2. Once validate. You can register enclaves (Have to register 5 enclaves with 10 different account)
+3. Assign Enclaves to the cluster
+4. Each Enclave address should trigger addSecretShard() from “nft” pallet
+5. Now it’s synced
+
 ## Metadata
 
 metadata example
