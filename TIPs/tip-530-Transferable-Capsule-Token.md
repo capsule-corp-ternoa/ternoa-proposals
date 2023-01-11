@@ -64,7 +64,24 @@ interface {
 ```
 
 ## Constraints
+Capsules will behave similar to secret NFTs for the following actions:
+1. Transfers
+2. Market place listing & trading
+3. Delegation
+4. Soulbound property
+5. Collections
+6. Renting
+7. Ability to be used as rental fee.
 
+Capsules differ from secret NFTs in the following areas:
+1. Capsules have mutable content (offchain data), whereas secret NFT contents are immutable.
+2. Capsules can have more than one media file but secret NFTs can only have one file. (Files can be of any type including text, pdfs, images, video, audio, etc).
+3. Cryptographic keys used to encrypt contents can be changed for capsules by the current owner, but not for secret nfts. 
+4. When a secret NFT is converted to a capsule, the key for secret nft cannot be changed, but the key for the capsule can be changed by capsule owner.
+5. There will be a one-time fee for minting capsules.
+6. A basic NFT can be burned even after it is converted into a secret NFT or capsule.
+7. If a secret NFT or a capsule is delegated, the delegatee/rentee can decrypt the contents.
+8. 
 ## Additional Info
 
 ## Metadata
@@ -112,10 +129,11 @@ This metadata of capsule NFT will be stored on IPFs, and it’s content Id (CID)
 - User **should be able to** mint a TCT directly
 - Owner **should be able to** convert a Basic NFT to TCT
 - Owner **should be able to** decrypt content data associated with the TCT
-- Owner **should be able to** transfer a TCT using tansmission protocols
-- Owner **should not be able to** transfer a TCT wihtout using transmission protocols
-- Owner **should not be able to** list TCT in the marketplace
-- Owner **should not be able to** trade TCT in any marketplace
+- Owner **should be able to** transfer a TCT either by direct transfer or using tansmission protocols
+- Owner **should be able to** list TCT in the marketplace
+- Owner **should be able to** trade TCT in any marketplace
+- Owner **should be able to** rent or delegate a capsule
+- Owner **should be able to** use a capsule as rental fee
  
 ## References
 
