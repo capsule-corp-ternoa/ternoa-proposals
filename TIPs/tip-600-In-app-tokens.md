@@ -6,7 +6,7 @@
 | TIP Number   | TIP-600       |
 | Version   | v0.1       |
 | Requires   |       |
-| Status | Draft       |
+| Status | In Progress       |
 | Category   | Fungible tokens       |
 | Discussions-To   | https://github.com/capsule-corp-ternoa/ternoa-hub/discussions     |
 

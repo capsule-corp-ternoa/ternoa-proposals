@@ -1,8 +1,8 @@
 ---
-tip: TIP-510
+tip: TIP-520
 title: Secret NFT
 version: 0.2
-status: DRAFT
+status: In progress
 category: NFT
 authors: Mohsin Riaz, Amin Razavi, Prabhu Eshwarla, Ghali El Ouarzazi
 created: 2022-09-07
@@ -36,22 +36,22 @@ Secret NFT should support the following onchain interfaces:
 ```rust
 interface {
 
-  /// Interface Id: TIP501-01
+  /// Interface Id: TIP520-01
   /// Description: User can convert an existing Basic NFT into a Secret NFT
   /// Constraint(s): Refer to section 'Rules'
   add_secret(nft_id: NFTId, secret_offchain_data: BoundedVec<u8, NFTOffchainDataLimit>);
   
-  /// Interface Id: TIP501-02
+  /// Interface Id: TIP520-02
   /// Description: User can directly create an on-chain Secret NFT
   /// Constraint(s): Refer to section 'Rules'
   create_secret_nft(offchain_data: BoundedVec<u8, NFTOffchainDataLimit>, secret_offchain_data: BoundedVec<u8, NFTOffchainDataLimit>, royalty: Permill, collection_id: Option<CollectionId>, is_soulbound: bool);
 
-  /// Interface Id: TIP501-03
+  /// Interface Id: TIP520-03
   /// Description: This interface is called by each of the TEE enclaves to confirm receipt of secret share for a given NFT. When all enclaves from a cluster confirm receipt of threshold shares, the secret NFT status goes to 'Minted', after which it can be transferred or listed on marketplace. This is a private interface available only for the enclaves to use
   /// Constraint(s): Refer to section 'Rules'
   add_secret_share(NFTId nft_id)
 
-  /// Interface Id: TIP501-04
+  /// Interface Id: TIP520-04
   /// Description: Secret NFT mint fee can be changed through governance
   /// Constraint(s): Refer to section 'Rules'
   set_secret_nft_mint_fee(fee: u128 (BalanceOf))
@@ -68,9 +68,10 @@ interface {
 #### create_secret_nft
 - The Secret NFT when minted should initially be set to 'Pending Mint' State. Only when all the secret shares associated with the NFT have been stored in the enclaves, should the Secret NFT move to 'Minted' state.
 
-#### add_secret_share
+#### add_secret_shard
 - Only enclaves can use this interface. Not to be used by dApps or users.
 - When all the secret shares associated with a secret NFT have been confirmed to be received, then the NFT state should be changed from 'Pending Mint' to 'Minted'
+- NFT must be in syncing state
 
 #### convert_basic_to_secret_nft
 - The Basic NFT should not be listed in a marketplace or delegated at the time of conversion to Secret NFT
