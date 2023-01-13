@@ -3,7 +3,7 @@
 | Author(s)      |  |
 | ----------- | ----------- |
 | Created   | 15 Nov 2022       |
-| TIP Number   | TIP-520       |
+| TIP Number   | TIP-510       |
 | Version   | v0.1       |
 | Status | In Progress       |
 | Category   | Blockchain, TEE       |
