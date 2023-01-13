@@ -142,7 +142,11 @@ interface {
 - When a secret NFT is converted to a capsule, the key for secret nft cannot be changed, but the key for the capsule can be changed by capsule owner.
 - There will be a one-time fee for minting capsules.
 - A basic NFT can be burned even after it is converted into a secret NFT or capsule.
-- If a secret NFT or a capsule is delegated, the delegatee/rentee can decrypt the contents.
+- If a secret NFT or a capsule is delegated / rented, the delegatee/rentee can decrypt the contents.
+- Decision should be made from tech to chose if 
+	- Capsule is a separate pallet
+	- Capsule is integrated in NFT pallet
+	- Create capsule is in NFT pallet and the rest is in a separate pallet
 
 ## Metadata
 

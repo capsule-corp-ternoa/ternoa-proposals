@@ -14,7 +14,7 @@ created: 2023-01-13
 
 ## Simple Summary
 
-Ternoa has created transmission protocols to be able to change the state and ownership of a digital asset (NFT) automatically after a specifric condition has been met. 
+Ternoa has created transmission protocols to be able to change the state and ownership of a digital asset (NFT) automatically after a specific condition has been met. 
 
 ## Abstract
 
@@ -35,6 +35,19 @@ onchain interfaces:
 
 ```rust
 interface {
+	/// Cancellation period enum
+	enum CancellationPeriod {
+		None,
+		UntilBlock<BlockNumber>,
+		Anytime,
+	}
+
+	/// Transmission protocol enum
+	enum TransmissionProtocol {
+		AtBlock<BlockNumber>
+		AtBlockWithReset<BlockNumber>
+		OnConsent<BoundedVec<BoundedVec<AccoundId, AccountSizeLimit>, threshold: u8>>
+	}
 
 	/// Interface Id: TIP540-01
 	/// Description: User can add a transmission protocol to any type of NFT. 
@@ -44,7 +57,7 @@ interface {
 	/// - OnConsent (BoundedVec<AccoundId>, threshold: u8)
 	/// All protocols can be cancellable or not (details specified in TransmissionProtocol struct)
 	/// Constraint(s): Refer to section 'Constraint'
-	set_transmission_protocol(nft_id: NFTId, recipient: AccountId, protocol: TransmissionProtocol);
+	set_transmission_protocol(nft_id: NFTId, recipient: AccountId, protocol: TransmissionProtocol, cancellation_period: CancellationPeriod);
 
 	/// Interface Id: TIP540-02
 	/// Description: User can remove the transmission protocol if he allowed it when adding it.
@@ -65,7 +78,7 @@ interface {
 	/// Interface Id: TIP540-05
 	/// Description: Specify the fee for a transmission protocol.
 	/// Constraint(s): Refer to section 'Constraint'
-	set_protocol_fee(protocol_type: TransmissionProtocolType);
+	set_protocol_fee(protocol_type: TransmissionProtocol, fee: u64);
 }
 
 ```
@@ -81,7 +94,7 @@ interface {
 	- Syncing
 	- Used as rental cancellation fee
 	- In Transmission
-	- User must have enough funds to cover the transmission protocol fee
+- User must have enough funds to cover the transmission protocol fee
 
 ### remove_transmission_protocol
 - Called by the owner of the NFT
@@ -102,7 +115,7 @@ interface {
 - Caller must be root
 
 ## Additional Info
-- 
+- This will be a separate pallet called transmission_protocols
 
 ## Metadata
 
