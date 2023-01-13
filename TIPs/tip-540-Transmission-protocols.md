@@ -61,6 +61,11 @@ interface {
 	/// If the threshold is reached, the NFT will be sent to recipient.
 	/// Constraint(s): Refer to section 'Constraint'
 	add_consent(nft_id: NFTId);
+
+	/// Interface Id: TIP540-05
+	/// Description: Specify the fee for a transmission protocol.
+	/// Constraint(s): Refer to section 'Constraint'
+	set_protocol_fee(protocol_type: TransmissionProtocolType);
 }
 
 ```
@@ -76,6 +81,7 @@ interface {
 	- Syncing
 	- Used as rental cancellation fee
 	- In Transmission
+	- User must have enough funds to cover the transmission protocol fee
 
 ### remove_transmission_protocol
 - Called by the owner of the NFT
@@ -92,6 +98,8 @@ interface {
 - The NFT must be in transmission
 - Protocol must be OnConsent
 
+### set_protocol_fee
+- Caller must be root
 
 ## Additional Info
 - 
