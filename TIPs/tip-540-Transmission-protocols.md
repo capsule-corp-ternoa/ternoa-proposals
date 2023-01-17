@@ -44,7 +44,8 @@ interface {
 	enum TransmissionProtocol {
 		AtBlock<BlockNumber>
 		AtBlockWithReset<BlockNumber>
-		OnConsent<BoundedVec<BoundedVec<AccoundId, AccountSizeLimit>, threshold: u8>>
+		OnConsent<(BoundedVec<AccoundId, AccountSizeLimit>, threshold: u8)>
+		OnConsentAtBlock<(BoundedVec<AccoundId, AccountSizeLimit>, threshold: u8, BlockNumber)>
 	}
 
 	/// Interface Id: TIP540-01
