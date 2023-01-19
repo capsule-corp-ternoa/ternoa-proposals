@@ -1,14 +1,13 @@
+| Author(s)      | Ghali El Ouarzazi, Prabhu Eshwarla, Benjamin Arthuys <benjamin@capsule-corp.io> |
+| ----------- | ----------- |
+| Created   | 2022-10-06       |
+| TIP Number   | TIP-530       |
+| Version   | v1.0       |
+| Requires   | <Link to Basic NFT TIP here>       |
+| Status | In Progress       |
+| Category   | NFT, Token       |
+| Discussions-To   | https://github.com/capsule-corp-ternoa/ternoa-hub/discussions     |
 
----
-tip: TIP-530
-title: Capsule
-version: 1.0
-status: In progress
-category: NFT, Token
-authors: Ghali El Ouarzazi, Prabhu Eshwarla, Benjamin Arthuys <benjamin@capsule-corp.io>
-created: 2022-10-06
-
----
 
 # Capsule
 

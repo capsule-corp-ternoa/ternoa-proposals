@@ -1,14 +1,12 @@
-
----
-tip: TIP-540
-title: Transmission protocols
-version: 1.0
-status: In progress
-category: NFT, Token, Capsule, Oracles
-authors: Ghali El Ouarzazi
-created: 2023-01-13
-
----
+| Author(s)      | Ghali El Ouarzazi |
+| ----------- | ----------- |
+| Created   | 2023-01-13       |
+| TIP Number   | TIP-540       |
+| Version   | v1.0       |
+| Requires   | <Link to Basic NFT TIP here>       |
+| Status | In Progress       |
+| Category   | NFT, Token, Capsule, Oracles       |
+| Discussions-To   | https://github.com/capsule-corp-ternoa/ternoa-hub/discussions     |
 
 # Transmission protocols
 
@@ -46,7 +44,8 @@ interface {
 	enum TransmissionProtocol {
 		AtBlock<BlockNumber>
 		AtBlockWithReset<BlockNumber>
-		OnConsent<BoundedVec<BoundedVec<AccoundId, AccountSizeLimit>, threshold: u8>>
+		OnConsent<(BoundedVec<AccoundId, AccountSizeLimit>, threshold: u8)>
+		OnConsentAtBlock<(BoundedVec<AccoundId, AccountSizeLimit>, threshold: u8, BlockNumber)>
 	}
 
 	/// Interface Id: TIP540-01
