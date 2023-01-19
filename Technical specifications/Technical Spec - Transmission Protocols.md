@@ -134,6 +134,9 @@ pub enum Event {
     protocol,
     fee,
   },
+  ThresholdReached {
+    nft_id,
+  },
   Transmitted{
     nft_id,
   }
