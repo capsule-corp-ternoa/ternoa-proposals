@@ -2,12 +2,8 @@
 ## Structures
 ```rust
 pub  struct  NFTState  {  // added is_syncing_capsule
-	pub is_capsule:  bool,
-	pub is_listed:  bool,
-	pub is_secret:  bool,
-	pub is_delegated:  bool,
-	pub is_soulbound:  bool,
-	pub is_syncing:  bool,
+	//...
+	pub is_syncing_secert:  bool,
 	pub is_syncing_capsule: bool,
 }
 ```
