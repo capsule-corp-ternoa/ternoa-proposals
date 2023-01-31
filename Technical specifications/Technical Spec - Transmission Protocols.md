@@ -51,7 +51,7 @@ enum CancellationPeriod {
 ```rust
 type MaxBlockDuration:  Get<u32>(525_948_766);
 type MaxConsentListSize:  Get<u32>(10);
-type SimultaneousTransmissionLimit: Get<u32>(10_000_000);
+type SimultaneousTransmissionLimit: Get<u32>(1_000_000);
 type ActionsInBlockLimit: Get<u32>(1_000);
 ```
 
