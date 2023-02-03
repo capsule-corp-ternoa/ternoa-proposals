@@ -101,7 +101,9 @@ The format for the offchain metadata of Secret NFT is suggested here:
     "encrypted_media":{
       "hash":"media hash",
       "type":"Type of media (file format)",
-      "size":"size of the encrypted media"
+      "size":"size of the encrypted media",
+      "name":"name of the media (optional)",
+			"description":"description of the media (optional)",
     },
   "public_key_of_nft": "(Optional) public key associated with the Secret NFT",
   }
