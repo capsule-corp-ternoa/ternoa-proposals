@@ -158,13 +158,22 @@ The format for the offchain metadata of Capsule NFT is suggested here:
 	"title":"(Optional) This the title of the Capsule NFT",
 	"description":"(Optional) Description of the Capsule NFT",
 	"properties":{
-		"encrypted_media":[{
+		"encrypted_media":[
+		    {
 			"hash":"media hash",
 			"type":"Type of media (file format)",
 			"size":"size of the encrypted media",
 			"name":"name of the media (optional)",
 			"description":"description of the media (optional)",
-		}],
+		    },
+		    {
+			"hash":"media hash",
+			"type":"Type of media (file format)",
+			"size":"size of the encrypted media",
+			"name":"name of the media (optional)",
+			"description":"description of the media (optional)",
+		    },
+		],
 		"public_key_of_nft": "public key associated with the Capsule NFT",
 	}
 }
