@@ -339,16 +339,16 @@ Capsule Endpoints {
     //METHOD:     GET
     //BODY:       -
     //PARAMETER:  nft-id (uint32)
-    "Keyshare Availability" : "https://<Chain-Version-Cluster-Node>.ternoa.[network]:<Port>/api/capsule-nft/is-keyshare-available/<nftid>",
+    "Keyshare Availability" : "/api/capsule-nft/is-keyshare-available/<nftid>",
 
     //METHOD:     GET
     //BODY:       -
     //PARAMETER:  nft-id (uint32)
-    "Views Log" : "https://<Chain-Version-Cluster-Node>.ternoa.[network]:<Port>/api/capsule-nft/get-views-log/<nftid>",
+    "Views Log" : "/api/capsule-nft/get-views-log/<nftid>",
 
     //METHOD:     POST
     //PARAMETER:  -
-    "Store Secret": "https://<Chain-Version-Cluster-Node>.ternoa.[network]:<Port>/api/capsule-nft/store-keyshare",
+    "Store Secret": "/api/capsule-nft/store-keyshare",
     "body":
             {
                 "owner_address": "Owner's account id in SS58 format",
@@ -360,7 +360,7 @@ Capsule Endpoints {
 
     //METHOD:     POST
     //PARAMETER:  -
-    "Retrieve Secret": "https://<Chain-Version-Cluster-Node>.ternoa.[network]:<Port>/api/capsule-nft/retrieve-keyshare",
+    "Retrieve Secret": "/api/capsule-nft/retrieve-keyshare",
     "body":       
             {
                 "requester_address": "Requester's account id in SS58 format",
@@ -371,7 +371,7 @@ Capsule Endpoints {
 
     //METHOD:     POST
     //PARAMETER:  -
-    "Remove Secret" : "https://<Chain-Version-Cluster-Node>.ternoa.[network]:<Port>/api/capsule-nft/remove-keyshare"
+    "Remove Secret" : "/api/capsule-nft/remove-keyshare"
     //POST BODY:       
             {
                 "requester_address": "5G1AGc....DrzFs",
@@ -386,60 +386,15 @@ Capsule Endpoints {
 ---
 
 &nbsp;
-### APP/SDK Interface
+### External Interfaces
 &nbsp;
 
-```javascript
-interface {
-    /// Store a secret share
-    StoreSecretShare(   uint32 nft_id, 
-                        bytes encrypted_secret_share, 
-                        bytes signature);
-
-    /// Store a secret share
-    ChangeSecretShare(  uint32 nft_id, 
-                        bytes encrypted_secret_share, 
-                        bytes signature);
-
-
-    /// Retrieve a secret share
-    RetrieveSecretShare(uint32 nft_id,
-                        bytes optional_data,
-                        bytes signature);
-}
-
-```
+* [JS SDK Store Keyshare](https://github.com/capsule-corp-ternoa/ternoa-js/blob/3ed613d9c60c54d097f971975ba8cac66cee24ae/src/helpers/tee.ts#L234)
+* [JS SDK Retrieve Keyshare](https://github.com/capsule-corp-ternoa/ternoa-js/blob/3ed613d9c60c54d097f971975ba8cac66cee24ae/src/helpers/tee.ts#L317)
 &nbsp;
-### Blockchain Interfaces (SGX-Pallet)[TIP-800]
+* [Blockchain Interfaces (TEE-Pallet)](https://github.com/capsule-corp-ternoa/ternoa-proposals/blob/eb26b8c0aea2350b567b006a411051e53bedf320/TIPs/tip-510-TEE-Pallet.md#existing-interfaces-changed)
 &nbsp;
 
-``` javascript
-
-// Add an enclave on blockchain
-RegisterEnclave(bytes enclave_ias_report, bytes enclave_url);
-
-// Remove an enclave from blockchain
-UnregisterEnclave(bytes enclave_url)
-
-```
-
-&nbsp;
-### Extrinsics
-&nbsp;
-``` javascript
-
-// sgx-pallet : Scheduled keep-alive report to blockchain
-// unsigned extrinsic
-xt_heartbeat(bytes activity_proof);
-
-// secret_nft-pallet, capsule-pallet : secret-share received,stored and sealed on enclave
-// signed extrinsic
-xt_secret(bytes xt_)
-
-```
-&nbsp;
-
----
 
 &nbsp;
 ## End-to-end workflow (Ternoa-specific)
