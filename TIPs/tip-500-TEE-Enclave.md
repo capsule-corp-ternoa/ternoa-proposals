@@ -64,7 +64,7 @@ With a minimum threshold, it can be ensured that even if some of the participant
 
 &nbsp;
 ## Cluster Network
-In Ternoa architecture, enclaves are organized in clusters to support secret sharing. Each cluster is made of 5 different encalves. Enclaves of a cluster can either belong to a single private owner (for permissioned use) or be publicly distributed in different geographical locations or cloud providers. 
+In Ternoa architecture, enclaves are organized in clusters to support secret sharing. Each cluster is made of 5 different enclaves. Enclaves of a cluster can either belong to a single private owner (for permissioned use) or be publicly distributed in different geographical locations or cloud providers. 
 
 Proposal to register or remove a cluster requires approval from technical committee of the Ternoa network, which is accessible from [polkadotjs](https://polkadot.js.org/apps/?rpc=wss://mainnet.ternoa.network/) app for everyone.
 
@@ -89,47 +89,61 @@ Enclaves of a cluster essentially do not share any data between each other, howe
 &nbsp;
 ### General API
 &nbsp;
-* Healthchek
+* Health check
+
+&nbsp;
+Expresses the current status of enclave, as well as information about the identity of enclave, including an account address generated inside the enclave.
+If this API does not return anything or status is not 200, client should wait or use another enclave.
+
 ```json
-ENDPOINT:   https://alphanet-c1n1v2.ternoa.dev:8100/api/health
-METHOD:     GET
-BODY:       -
-PARAMETER:  -
-RESPONSE:   
+// ENDPOINT:   https://alphanet-c1n1v2.ternoa.dev:8100/api/health
+// METHOD:     GET
+// BODY:       -
+// PARAMETER:  -
+//SAMPLE RESPONSE:  
 {
     "status": 200,
     "date": "2023-04-24 14:16:24",
     "description": "SGX server is running!",
-    "enclave_address": "5C4xwspW1txnjCM71ZM2hpqqoqYa5x7iSkjAAYQqSNcSDnwG"
+    "enclave_id": "<Chain Name>-<Cluster Number><Node Number><Enclave Number>",
+    "enclave_address": "SS58 Account ID of Enclave which is registered on blockchain"
 }
 
 ```
 
 &nbsp;
 * Attestation Quote
+  
+&nbsp;
+To do a Remote Attestation against an enclave, a valid quote is essential. Then quote will be sent to Intel API with additional parameters like SPID and Key to receive the Attestation Report. 
 
 ```json
-ENDPOINT:   https://alphanet-c1n1v2.ternoa.dev:8100/api/quote
-METHOD:     GET
-BODY:       -
-PARAMETER:  -
-RESPONSE:   
+//ENDPOINT:   https://alphanet-c1n1v2.ternoa.dev:8100/api/quote
+//METHOD:     GET
+//BODY:       -
+//PARAMETER:  -
+//SAMPLE RESPONSE:   
 {
     "status": "Success",
-    "data": "020001002b0c00000e000e000000000015ad86b4cfa46b327a8bfb79aa0d67b70000000000000000000000000000000006080216ffff0400000000000000000000000000000000000000000000000000000000000000000000000000000000000700000000000000e7000000000000004747dc15efe9e8897dc0f2bfdc74a2c7b58bb09984c77f4c9fa01b2e6209ccfc0000000000000000000000000000000000000000000000000000000000000000ae790e644a1476cf87d2b64e547ed454879d351825507104e055a13048e71f6d00..."
+    "data": "Hex string containing new quote and signature payload"
 }
 
 ```
+
 &nbsp;
 ### Secret-NFT API
 &nbsp;
-* Availability of secret-nft on an enclave
+* Availability of a secret-nft on an enclave
+
+&nbsp;
+This endpoint is a short-cut to check if a specific nft-id is available onchain and its encryption key shares are stored on this enclave or not. Since this does not need signed payload is more efficient before requesting to retrieve the secrets. 
+
 ```json
-ENDPOINT:   https://mainnet-tee-c1n1v1.ternoa.network:8100//api/secret-nft/is-keyshare-available/123654
-METHOD:     GET
-BODY:       -
-PARAMETER:  nft-id (uint32)
-RESPONSE:   
+//ENDPOINT:   https://mainnet-tee-c1n1v1.ternoa.network:8100/api/secret-nft/is-keyshare-available/123654
+//METHOD:     GET
+//BODY:       -
+//PARAMETER:  nft-id (uint32)
+//SAMPLE RESPONSE:  
 {
     "enclave_id": "MAINNET-C1N1E1",
     "nft_id": 123654,
@@ -142,48 +156,58 @@ RESPONSE:
 &nbsp;
 * View logs of secret-nft
 
+&nbsp;
+It is necessary in secret marketplace to know by which owners and how many times a secret-nft is opened. Using this API whole the history of the secret-nft can be traced back up the creation moment. It also shows capsule history if secret-nft is converted to capsule.
+
 ```json
-ENDPOINT:   https://alphanet-c1n1v2.ternoa.dev:8100/api/secret-nft/get-views-log/73331
-METHOD:     GET
-BODY:       -
-PARAMETER:  nft-id (uint32)
-RESPONSE:   
+//ENDPOINT:   https://alphanet-c1n1v2.ternoa.dev:8100/api/secret-nft/get-views-log/73331
+//METHOD:     GET
+//BODY:       -
+//PARAMETER:  nft-id (uint32)
+//SAMPLE RESPONSE:   
 {
     "enclave_id": "ALPHANET-C1N1V2EI",
     "nft_id": 73390,
 
     "log": {
+
+        // secret-nft part
         "secret_nft": {
+            // Creation
             "0": {
                 "date": "2023-03-10 18:47:06",
                 "account": {
-                    "address": "5EyFqdBXjyUXHEk3Thuxy5tVD617nyD8xnUYSAUY7DvoeMdJ",
+                    "address": "Owner account id",
                     "role": "OWNER"
                 },
                 "event": "STORE"
             },
+            // NFT has been delegated and viewd by a delegatee :
             "1": {
                 "date": "2023-03-10 18:48:02",
                 "account": {
-                    "address": "5C4xwspW1txnjCM71ZM2hpqqoqYa5x7iSkjAAYQqSNcSDnwG",
+                    "address": "Delegatee account id",
                     "role": "DELEGATEE"
                 },
                 "event": "VIEW"
             },
+            // NFT has been rented and viewd by a renter :
             "2": {
                 "date": "2023-03-10 18:48:08",
                 "account": {
-                    "address": "5EyFqdBXjyUXHEk3Thuxy5tVD617nyD8xnUYSAUY7DvoeMdJ",
-                    "role": "OWNER"
+                    "address": "Rentee account id",
+                    "role": "RENTEE"
                 },
                 "event": "VIEW"
             }
         },
+
+        // Capsule Part
         "capsule": {
             "0": {
                 "date": "2023-03-10 18:48:23",
                 "account": {
-                    "address": "5EyFqdBXjyUXHEk3Thuxy5tVD617nyD8xnUYSAUY7DvoeMdJ",
+                    "address": "Owner account id",
                     "role": "OWNER"
                 },
                 "event": "VIEW"
@@ -198,19 +222,41 @@ RESPONSE:
 
 &nbsp;
 * <span style="color:white">Store secret to enclave</span>.
+
+&nbsp;
+It is possible for someone to mint multiple secret-nft at the same time, however every minting request requires approval from owner that is not pleasant from user experience point of view. Thus dApp can implicitly create a secure temporary account named "signer" for current owner specially for current multiple-minting request. The Signer account should be approved by real owner to be able to sign the requests to enclave. Regarding this protocol, the store request will need five fields : 
+
+- Owner address : Account ID of real Wallet/dApp owner who is minting the secret-nft. Enclave verifies the ownership of NFT-ID against this owner address.
+  
+- Authentication token : This two part token is a suffix to important data fields before signing. Its presence is significant to prevent replay attack to Enclaves.
+    - Current Block Number : This proves that the request is not too old or for future
+    - Validity Interval : produce a margin around current block number. Maximum value of this field is 20 blocks.
+  
+- Signer address: Temporary account generated for signing the secrets on behalf of the owner. This field must be concatenated with a valid authentication token through an underscore.
+
+- Signer Signature : The owner should sign the signer address and authenticated token to approve the validity of it. Enclaves verify the signature then the token validity before processing the data.
+  
+- Secret data : Contains the NFT-ID, Secret Share of encryption key for secret-NFT and an Authentication token. This is the data that Enclaves seal and store.
+  
+- Signature : The signer account signs the Secret-Data to prove that this secret is owned by the owner of claimed NFT-ID.
+
+Enclaves only support SR25519 signatures.
+
+
 ```json
-ENDPOINT:   https://alphanet-c1n1v2.ternoa.dev:8100/api/secret-nft/store-keyshare
-METHOD:     POST
-PARAMETER:  -
-BODY:       
+//ENDPOINT:   https://alphanet-c1n1v2.ternoa.dev:8100/api/secret-nft/store-keyshare
+//METHOD:     POST
+//PARAMETER:  -
+//POST BODY:       
             {
-                "owner_address": "5Ccq....v7tC",
-                "signer_address": "5Fsr...UPQe_<Current Block Number>_<Validity Interval>",
-                "signersig": " Above 'signer_address' field signed by 'owner' ",
+                "owner_address": "Owner's account id in SS58 format",
+                "signer_address": "<Signer account id>_<Current Block Number>_<Validity Interval>",
+                "signersig": " SR25519 Signature of above 'signer_address' field signed by 'owner' ",
                 "data": "<NFT ID>_<Secret String>_<Current Block Number>_<Validity Interval>",
-                "signature": " Above 'data' field signed by 'signer' "
+                "signature": " SR25519 Signature of above 'data' field signed by 'signer' "
             }
-RESPONSE:   
+
+//SAMPLE RESPONSE:
 {
     "status": "EXPIREDSIGNER",
     "enclave_id": "ALPHANET-C1N1E1",
@@ -219,22 +265,34 @@ RESPONSE:
 }
 
 ```
-
 &nbsp;
 * <span style="color:white">Retrieve secret from enclave</span>.
+
+&nbsp;
+Retrieve means request a secret-share to reconstruct the decryption key of secret-NFT media. So Enclave has to make sure that requester has enough privilege to view the NFT content.   
+
+There are three persons who can view a secret : 
+* Current nft owner
+* Who has Rented the nft from current owner
+* Who has been delegated by current owner
+
+Enclaves needs to validate the requester with onchain data before letting her to view the secret. So requester must specify her privilege type specially if she is a Renter or Delegatee. 
+The requested NFT-ID has to be concatenated with an Authentication Token which contains current block number and validity interval. Then requester has to sign the data string to prove the ownership of the account id and authenticity of the request.
+
+
 ```json
-ENDPOINT:   https://alphanet-c1n1v2.ternoa.dev:8100/api/secret-nft/retrieve-keyshare
-METHOD:     POST
-PARAMETER:  -
-BODY:       
+//ENDPOINT:   https://alphanet-c1n1v2.ternoa.dev:8100/api/secret-nft/retrieve-keyshare
+//METHOD:     POST
+//PARAMETER:  -
+//POST BODY:       
             {
-                "requester_address": "5Ccq....v7tC",
-                "requester_type": "OWNER",
+                "requester_address": "Requester's account id in SS58 format",
+                "requester_type": "[OWNER | RENTEE | DELEGATEE]",
                 "data": "<NFT ID>_<Current Block Number>_<Validity Interval>",
-                "signature": "0x8ebd....c08f82"
+                "signature": "SR25519 Signature of above 'data' field signed by 'requester'"
             }
-            
-RESPONSE:   
+
+//SAMPLE RESPONSE:   
 {
     "status": "RETRIEVESUCCESS",
     "nft_id": 110,
@@ -247,17 +305,22 @@ RESPONSE:
 
 &nbsp;
 * <span style="color:white">Remove secret from enclave</span>.
+
+&nbsp;
+Anybody can request to remove the data for a NFT-ID. However Enclaves checks the blockchain if the NFT associated to the requested NFT-ID has been burnt already.
+
+&nbsp;
 ```json
-ENDPOINT:   https://alphanet-c1n1v2.ternoa.dev:8100/api/secret-nft/remove-keyshare
-METHOD:     POST
-PARAMETER:  -
-BODY:       
+//ENDPOINT:   https://alphanet-c1n1v2.ternoa.dev:8100/api/secret-nft/remove-keyshare
+//METHOD:     POST
+//PARAMETER:  -
+//POST BODY:       
             {
                 "requester_address": "5G1AGc....DrzFs",
                 "nft_id": 1336
             }
-            
-RESPONSE:   
+
+//SAMPLE RESPONSE:   
 {
     "status": "REMOVESUCCESS",
     "nft_id": 1336,
@@ -267,11 +330,55 @@ RESPONSE:
 
 ```
 
-
 &nbsp;
 ### Capsule API
-Capsule endpoints are exactly the same as Secret-NFT API, by replacing *secret-nft* to *capsule-nft* someone can communicate capsules secrets.
+Capsule endpoints are exactly the same as Secret-NFT API, by replacing *secret-nft* to *capsule-nft* someone can communicate capsules secrets :
 
+```json
+Capsule Endpoints {
+    //METHOD:     GET
+    //BODY:       -
+    //PARAMETER:  nft-id (uint32)
+    "Keyshare Availability" : "https://<Chain-Version-Cluster-Node>.ternoa.[network]:<Port>/api/capsule-nft/is-keyshare-available/<nftid>",
+
+    //METHOD:     GET
+    //BODY:       -
+    //PARAMETER:  nft-id (uint32)
+    "Views Log" : "https://<Chain-Version-Cluster-Node>.ternoa.[network]:<Port>/api/capsule-nft/get-views-log/<nftid>",
+
+    //METHOD:     POST
+    //PARAMETER:  -
+    "Store Secret": "https://<Chain-Version-Cluster-Node>.ternoa.[network]:<Port>/api/capsule-nft/store-keyshare",
+    "body":
+            {
+                "owner_address": "Owner's account id in SS58 format",
+                "signer_address": "<Signer account id>_<Current Block Number>_<Validity Interval>",
+                "signersig": " SR25519 Signature of above 'signer_address' field signed by 'owner' ",
+                "data": "<NFT ID>_<Secret String>_<Current Block Number>_<Validity Interval>",
+                "signature": " SR25519 Signature of above 'data' field signed by 'signer' "
+            }
+
+    //METHOD:     POST
+    //PARAMETER:  -
+    "Retrieve Secret": "https://<Chain-Version-Cluster-Node>.ternoa.[network]:<Port>/api/capsule-nft/retrieve-keyshare",
+    "body":       
+            {
+                "requester_address": "Requester's account id in SS58 format",
+                "requester_type": "[OWNER | RENTEE | DELEGATEE]",
+                "data": "<NFT ID>_<Current Block Number>_<Validity Interval>",
+                "signature": "SR25519 Signature of above 'data' field signed by 'requester'"
+            }
+
+    //METHOD:     POST
+    //PARAMETER:  -
+    "Remove Secret" : "https://<Chain-Version-Cluster-Node>.ternoa.[network]:<Port>/api/capsule-nft/remove-keyshare"
+    //POST BODY:       
+            {
+                "requester_address": "5G1AGc....DrzFs",
+                "nft_id": 1336
+            }
+}
+````
 
 
 &nbsp;
