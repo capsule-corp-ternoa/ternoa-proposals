@@ -8,6 +8,7 @@ where
 {
 	pub enclave_address: AccountId,
 	pub api_uri: BoundedVec<u8, MaxUriLen>,
+	pub is_staked: bool,
 }
 
 pub struct Cluster<AccountId, ClusterSize>
@@ -18,33 +19,7 @@ where
 	pub enclaves: BoundedVec<AccountId, ClusterSize>,
 }
 
-pub struct EnclaveStakingLedger<T: Config> {
-	/// The operator account whose balance is actually locked and at stake.
-	pub operator: T::AccountId,
-	/// The total amount of the stash's balance that we are currently accounting for.
-	/// It's just `active` plus all the `unlocking` balances.
-	#[codec(compact)]
-	pub total: BalanceOf<T>,
-	/// The total amount of the stash's balance that will be at stake in any forthcoming
-	/// rounds.
-	#[codec(compact)]
-	pub active: BalanceOf<T>,
-	/// Any balance that is becoming free, which may eventually be transferred out of the stash
-	/// (assuming it doesn't get slashed first). It is assumed that this will be treated as a first
-	/// in, first out queue where the new (higher value) eras get pushed on the back.
-	pub unlocking: BoundedVec<UnlockChunk<BalanceOf<T>>, T::MaxUnlockingChunks>,
-	/// List of eras for which the stakers have claimed rewards. 
-	pub claimed_rewards: BoundedVec<EraIndex, T::HistoryDepth>,
-}
 
-pub struct UnlockChunk<Balance: HasCompact + MaxEncodedLen> {
-	/// Amount of funds to be unlocked.
-	#[codec(compact)]
-	value: Balance,
-	/// Era number at which point it'll be unlocked.
-	#[codec(compact)]
-	era: EraIndex,
-}
 ```
 
 ## Types
@@ -58,8 +33,6 @@ type ListSizeLimit: Get<u32>;
 ```rust
 /// Reward Destination enum
 pub enum RewardDestination<AccountId> {
-	/// Pay into the operator account, increasing the amount at stake accordingly.
-	Staked,
 	/// Pay into the operator account, not increasing the amount at stake.
 	Operator,
 	/// Pay into a specified account.
@@ -76,7 +49,6 @@ interface {
   /// Origin : operator Account Address
   /// enclave_address :- Generated within each enclave (PK)
   /// api_uri :- API URI of the enclave
-  /// value :- Token value that is being staked with the registration
   /// payee :- Reward destination account ID
   /// Signed by operator (the origin)
   /// Notes:
@@ -87,15 +59,18 @@ interface {
   ///     4. Enclave address & operator address
   /// One operator can have one enclave.
   register_enclave_and_bond(origin: OriginFor<T>, enclave_address: Vec<u8>, api_uri: Vec<u8>, 
-  				#[pallet::compact] value: BalanceOf<T>, payee: RewardDestination<T::AccountId>)
+  								payee: RewardDestination<T::AccountId>)
 
   /// Removes an enclave from the system OR ask for removal if the enclave is assigned
   /// Origin : operator account address
   /// If the enclave is assigned, he will be placed in queue for tech committee approval and can 
   /// withdraw the unbonded stake after the unbonding period.
-  /// If the enclave is not already assigned, he can exit without permission and can unbond immediately.
+  /// If the enclave is not already assigned, he can exit without permission and can unbond and withdraw immediately.
   unregister_enclave_and_unbond(origin: OriginFor<T>)
   
+  /// Withdraws the unbonded amount after the unlocking period
+  withdraw_unbonded(origin: OriginFor<T>)
+
   /// Ask for update of the enclave fields
   /// Origin : operator account address
   /// If the enclave is not assigned, should trigger an error
@@ -172,6 +147,8 @@ pub enum Event {
 		ClusterRemoved { cluster_id: ClusterId },
 		Bonded { operator: T::AccountId, amount: BalanceOf<T> },
 		Unbonded { operator: T::AccountId, amount: BalanceOf<T> },
+		Withdrawn { operator: T::AccountId, amount: BalanceOf<T> },
+
 }
 ```
 ## Errors
