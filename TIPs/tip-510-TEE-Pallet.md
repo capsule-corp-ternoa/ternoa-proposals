@@ -110,6 +110,13 @@ interface {
   /// Origin : Root
   /// Cluster must be empty
   remove_cluster(origin: OriginFor<T> cluster_id: ClusterId)
+
+  /// Withdraws the unbonded amount after the unlocking period
+  withdraw_unbonded(origin: OriginFor<T>)
+
+  /// Register metrics server
+  /// Origin : Root
+  register_metrics_server(origin: OriginFor<T>, metrics_server_address: Account)
 }
 ```
 
