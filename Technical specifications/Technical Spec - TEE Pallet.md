@@ -1,4 +1,4 @@
-# Transmission Protocols
+# TEE Pallet
 ## Structures
 ```rust
 pub struct Enclave<AccountId, MaxUriLen>
@@ -8,7 +8,6 @@ where
 {
 	pub enclave_address: AccountId,
 	pub api_uri: BoundedVec<u8, MaxUriLen>,
-	pub is_staked: bool,
 }
 
 pub struct Cluster<AccountId, ClusterSize>
@@ -16,17 +15,33 @@ where
 	AccountId: Clone + PartialEq + Debug,
 	ClusterSize: Get<u32>,
 {
-	pub enclaves: BoundedVec<AccountId, ClusterSize>,
+	pub enclaves: BoundedVec<(AccountId, SlotId), ClusterSize>,
+	pub is_public: bool,
 }
 
-
-```
-
-## Types
-```rust
-type ClusterSize: Get<u32>;
-type MaxUriLen: Get<u32>;
-type ListSizeLimit: Get<u32>;
+/// The ledger of a (bonded) operator.
+#[derive(
+	PartialEqNoBound,
+	CloneNoBound,
+	Encode,
+	Decode,
+	RuntimeDebugNoBound,
+	TypeInfo,
+	MaxEncodedLen,
+)]
+#[codec(mel_bound(AccountId: MaxEncodedLen, BlockNumber: MaxEncodedLen))]
+pub struct TeeStakingLedger<AccountId, BlockNumber>
+where
+	AccountId: Clone + PartialEq + Debug,
+	BlockNumber: Clone + PartialEq + Debug + sp_std::cmp::PartialOrd + AtLeast32BitUnsigned + Copy,
+{
+	/// The operator account whose balance is actually locked and at stake.
+	pub operator: AccountId,
+	/// State variable to know whether the staked amount is unbonded
+	pub is_unlocking: bool,
+	/// Block Number of when unbonded happened
+	pub unbonded_at: BlockNumber
+}
 ```
 
 ## Enums
@@ -40,6 +55,15 @@ pub enum RewardDestination<AccountId> {
 	/// Receive no reward.
 	None,
 }
+```
+
+## Types
+```rust
+type ClusterSize: Get<u32>;
+type MaxUriLen: Get<u32>;
+type ListSizeLimit: Get<u32>;
+type TeeBondingDuration: Get<u32>;
+type InitialStakingAmount: Get<BalanceOf<Self>>;
 ```
 
 ## Extrinsic
@@ -90,7 +114,7 @@ interface {
   
   /// Assigns an EnclaveId to a cluster
   /// Origin : Root
-  assign_enclave(origin: OriginFor<T>, operator: Account, cluster_id: ClusterId)
+  assign_enclave(origin: OriginFor<T>, operator: Account, cluster_id: ClusterId, slot_id: SlotId)
   
   /// Remove a registration from the registration list (not assigned)
   /// Origin : Root
@@ -117,6 +141,10 @@ interface {
   /// Origin : Root
   /// Cluster must be empty
   remove_cluster(origin: OriginFor<T> cluster_id: ClusterId)
+
+  /// Register metrics server
+  /// Origin : Root
+  register_metrics_server(origin: OriginFor<T>, metrics_server_address: Account)
 }
 ```
 ## Events
@@ -148,6 +176,7 @@ pub enum Event {
 		Bonded { operator: T::AccountId, amount: BalanceOf<T> },
 		Unbonded { operator: T::AccountId, amount: BalanceOf<T> },
 		Withdrawn { operator: T::AccountId, amount: BalanceOf<T> },
+		MetricsServerAdded { metrics_server_address: T::AccountId },
 
 }
 ```
@@ -172,6 +201,11 @@ pub enum Error {
 	UpdateRequestNotFound,
 	UpdateProhibitedForUnassignedEnclave,
 	AlreadyBonded,
+	StakingNotFound,
+	UnbondingNotStarted,
+	WithdrawProhibited,
+	MetricsServerAlreadyExists,
+	MetricsServerLimitReached,
 }
 ```
 ## Side effects
