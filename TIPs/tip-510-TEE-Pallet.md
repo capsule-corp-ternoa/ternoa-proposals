@@ -117,6 +117,10 @@ interface {
   /// Register metrics server
   /// Origin : Root
   register_metrics_server(origin: OriginFor<T>, metrics_server_address: Account)
+
+  // Register metrics server
+  /// Origin : Root
+  submit_metrics_server_report(origin: OriginFor<T>, report_params: ReportParams)
 }
 ```
 

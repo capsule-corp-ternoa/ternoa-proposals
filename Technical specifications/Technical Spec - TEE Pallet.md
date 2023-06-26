@@ -20,16 +20,6 @@ where
 }
 
 /// The ledger of a (bonded) operator.
-#[derive(
-	PartialEqNoBound,
-	CloneNoBound,
-	Encode,
-	Decode,
-	RuntimeDebugNoBound,
-	TypeInfo,
-	MaxEncodedLen,
-)]
-#[codec(mel_bound(AccountId: MaxEncodedLen, BlockNumber: MaxEncodedLen))]
 pub struct TeeStakingLedger<AccountId, BlockNumber>
 where
 	AccountId: Clone + PartialEq + Debug,
@@ -41,6 +31,16 @@ where
 	pub is_unlocking: bool,
 	/// Block Number of when unbonded happened
 	pub unbonded_at: BlockNumber
+}
+
+/// Report Parameters that metrics servers submits
+pub struct ReportParams
+{
+	pub heath_check_score: u8,
+	pub storage_performance_score: u8,
+	pub retrieval_score: u8,
+	pub data_sync_score: u8,
+	pub error_rates_score: u8,
 }
 ```
 
@@ -145,6 +145,10 @@ interface {
   /// Register metrics server
   /// Origin : Root
   register_metrics_server(origin: OriginFor<T>, metrics_server_address: Account)
+
+  // Register submit report of metrics server
+  /// Origin : Root
+  submit_metrics_server_report(origin: OriginFor<T>, report_params: ReportParams)
 }
 ```
 ## Events
