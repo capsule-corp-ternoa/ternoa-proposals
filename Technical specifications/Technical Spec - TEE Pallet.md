@@ -36,11 +36,22 @@ where
 /// Report Parameters that metrics servers submits
 pub struct ReportParams
 {
-	pub heath_check_score: u8,
-	pub storage_performance_score: u8,
-	pub retrieval_score: u8,
-	pub data_sync_score: u8,
-	pub error_rates_score: u8,
+	pub param_1: u8,
+	pub param_2: u8,
+	pub param_3: u8,
+	pub param_4: u8,
+	pub param_5: u8,
+	pub enclave_address: AccountId,
+}
+
+/// Report Parameters weightage
+pub struct ReportParamsWeightage
+{
+	pub param_1_weightage: u8,
+	pub param_2_weightage: u8,
+	pub param_3_weightage: u8,
+	pub param_4_weightage: u8,
+	pub param_5_weightage: u8,
 }
 ```
 
@@ -64,6 +75,51 @@ type MaxUriLen: Get<u32>;
 type ListSizeLimit: Get<u32>;
 type TeeBondingDuration: Get<u32>;
 type InitialStakingAmount: Get<BalanceOf<Self>>;
+type MaxMetricsReports: Get<u32>;
+type MaxRewards: Get<u32>;
+type HistoryDepth: Get<u32>;
+```
+
+## Storages
+```rust
+/// Staking amount for TEE operator.
+#[pallet::storage]
+#[pallet::getter(fn staking_amount)]
+pub(super) type StakingAmount<T: Config> =
+	StorageValue<_, BalanceOf<T>, ValueQuery, T::InitialStakingAmount>;
+
+/// Tee Staking details mapped to operator address
+#[pallet::storage]
+#[pallet::getter(fn tee_staking_ledger)]
+pub type StakingLedger<T: Config> = StorageMap<
+	_,
+	Blake2_128Concat,
+	T::AccountId,
+	TeeStakingLedger<T::AccountId, T::BlockNumber>,
+	OptionQuery,
+>;
+
+/// Metrics Server accounts storage.
+#[pallet::storage]
+#[pallet::getter(fn nft_mint_fee)]
+pub(super) type MetricsServer<T: Config> =
+	StorageValue<_, BoundedVec<T::AccountId, T::ListSizeLimit>, ValueQuery>;
+
+
+#[pallet::storage]
+    #[pallet::getter(fn report_params_weightage)]
+    pub type ReportParamsWeightage<T: Config> =
+        StorageValue<_, ReportParamsWeightage, ValueQuery>;
+
+#[pallet::storage]
+#[pallet::getter(fn metrics_reports)]
+pub type MetricsReports<T: Config> =
+    StorageMap<_, Blake2_128Concat, T::AccountId, BoundedVec<MetricsServerReport<T::AccountId>, T::MaxMetricsReports>, OptionQuery>;
+
+#[pallet::storage]
+#[pallet::getter(fn rewards)]
+pub type Rewards<T: Config> =
+    StorageMap<_, Blake2_128Concat, T::EraIndex, BoundedVec<(T::AccountId, u64), T::MaxRewards>, OptionQuery>;
 ```
 
 ## Extrinsic
@@ -147,7 +203,7 @@ interface {
   register_metrics_server(origin: OriginFor<T>, metrics_server_address: Account)
 
   // Register submit report of metrics server
-  /// Origin : Root
+  /// Origin : Metric Server address
   submit_metrics_server_report(origin: OriginFor<T>, report_params: ReportParams)
 }
 ```
