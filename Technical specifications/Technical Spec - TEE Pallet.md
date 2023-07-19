@@ -36,12 +36,12 @@ where
 /// Report Parameters that metrics servers submits
 pub struct ReportParams
 {
+	pub operator_address: AccountId,
 	pub param_1: u8,
 	pub param_2: u8,
 	pub param_3: u8,
 	pub param_4: u8,
 	pub param_5: u8,
-	pub enclave_address: AccountId,
 }
 
 /// Report Parameters weightage
@@ -202,9 +202,17 @@ interface {
   /// Origin : Root
   register_metrics_server(origin: OriginFor<T>, metrics_server_address: Account)
 
-  // Register submit report of metrics server
+  /// Register submit report of metrics server
   /// Origin : Metric Server address
   submit_metrics_server_report(origin: OriginFor<T>, report_params: ReportParams)
+
+  /// Claim rewards
+  /// Origin : Operator address
+  claim_rewards(origin: OriginFor<T>)
+
+  /// Set report parameters weightage
+  /// Origin : Root
+  submit_metrics_server_report(origin: OriginFor<T>, report_params_weightage: ReportParamsWeightage)
 }
 ```
 ## Events
