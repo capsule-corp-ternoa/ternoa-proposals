@@ -212,7 +212,7 @@ interface {
 
   /// Set report parameters weightage
   /// Origin : Root
-  submit_metrics_server_report(origin: OriginFor<T>, report_params_weightage: ReportParamsWeightage)
+  set_report_params_weightage(origin: OriginFor<T>, report_params_weightage: ReportParamsWeightage)
 }
 ```
 ## Events
