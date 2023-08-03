@@ -1,4 +1,14 @@
 # TEE Pallet
+## Enums
+
+```rust
+pub enum ClusterType {
+	Disabled,
+	Admin,
+	Public,
+	Private,
+}
+```
 ## Structures
 ```rust
 pub struct Enclave<AccountId, MaxUriLen>
@@ -16,7 +26,7 @@ where
 	ClusterSize: Get<u32>,
 {
 	pub enclaves: BoundedVec<(AccountId, SlotId), ClusterSize>,
-	pub is_public: bool,
+	pub cluster_type: ClusterType,
 }
 
 /// The ledger of a (bonded) operator.
@@ -34,14 +44,16 @@ where
 }
 
 /// Report Parameters that metrics servers submits
-pub struct ReportParams
+pub struct MetricsServerReport<AccountId>
+where
+	AccountId: Clone + PartialEq + Debug,
 {
-	pub operator_address: AccountId,
 	pub param_1: u8,
 	pub param_2: u8,
 	pub param_3: u8,
 	pub param_4: u8,
 	pub param_5: u8,
+	pub submitted_by: AccountId,
 }
 
 /// Report Parameters weightage
@@ -53,18 +65,12 @@ pub struct ReportParamsWeightage
 	pub param_4_weightage: u8,
 	pub param_5_weightage: u8,
 }
-```
 
-## Enums
-```rust
-/// Reward Destination enum
-pub enum RewardDestination<AccountId> {
-	/// Pay into the operator account, not increasing the amount at stake.
-	Operator,
-	/// Pay into a specified account.
-	Account(AccountId),
-	/// Receive no reward.
-	None,
+/// Metrics Server details
+pub struct MetricsServer<AccountId>
+{
+	pub metrics_server_address: AccountId,
+	pub supported_cluster_type: ClusterType,
 }
 ```
 
@@ -78,48 +84,57 @@ type InitialStakingAmount: Get<BalanceOf<Self>>;
 type MaxMetricsReports: Get<u32>;
 type MaxRewards: Get<u32>;
 type HistoryDepth: Get<u32>;
+type PalletId: Get<PalletId>;
+type InitalDailyRewardPool: Get<BalanceOf<Self>>;
 ```
 
 ## Storages
 ```rust
-/// Staking amount for TEE operator.
-#[pallet::storage]
-#[pallet::getter(fn staking_amount)]
-pub(super) type StakingAmount<T: Config> =
-	StorageValue<_, BalanceOf<T>, ValueQuery, T::InitialStakingAmount>;
+	/// Tee Staking details mapped to operator address
+	#[pallet::storage]
+	#[pallet::getter(fn tee_staking_ledger)]
+	pub type StakingLedger<T: Config> = StorageMap<
+		_,
+		Blake2_128Concat,
+		T::AccountId,
+		TeeStakingLedger<T::AccountId, T::BlockNumber>,
+		OptionQuery,
+	>;
 
-/// Tee Staking details mapped to operator address
-#[pallet::storage]
-#[pallet::getter(fn tee_staking_ledger)]
-pub type StakingLedger<T: Config> = StorageMap<
-	_,
-	Blake2_128Concat,
-	T::AccountId,
-	TeeStakingLedger<T::AccountId, T::BlockNumber>,
-	OptionQuery,
->;
+	#[pallet::storage]
+	#[pallet::getter(fn metrics_reports)]
+	pub type MetricsReports<T: Config> = StorageDoubleMap<
+		_,
+		Blake2_128Concat,
+		EraIndex,
+		Blake2_128Concat,
+		T::AccountId,
+		BoundedVec<MetricsServerReport<T::AccountId>, T::ListSizeLimit>,
+		OptionQuery,
+	>;
 
-/// Metrics Server accounts storage.
-#[pallet::storage]
-#[pallet::getter(fn nft_mint_fee)]
-pub(super) type MetricsServer<T: Config> =
-	StorageValue<_, BoundedVec<T::AccountId, T::ListSizeLimit>, ValueQuery>;
+	/// Report params weightage
+	#[pallet::storage]
+	#[pallet::getter(fn report_params_weightages)]
+	pub type ReportParamsWeightages<T: Config> = StorageValue<_, ReportParamsWeightage, ValueQuery>;
 
+	/// Daily reward amount for TEE operator.
+	#[pallet::storage]
+	#[pallet::getter(fn daily_reward_pool)]
+	pub(super) type DailyRewardPool<T: Config> =
+		StorageValue<_, BalanceOf<T>, ValueQuery, T::InitalDailyRewardPool>;
 
-#[pallet::storage]
-    #[pallet::getter(fn report_params_weightage)]
-    pub type ReportParamsWeightage<T: Config> =
-        StorageValue<_, ReportParamsWeightage, ValueQuery>;
-
-#[pallet::storage]
-#[pallet::getter(fn metrics_reports)]
-pub type MetricsReports<T: Config> =
-    StorageMap<_, Blake2_128Concat, T::AccountId, BoundedVec<MetricsServerReport<T::AccountId>, T::MaxMetricsReports>, OptionQuery>;
-
-#[pallet::storage]
-#[pallet::getter(fn rewards)]
-pub type Rewards<T: Config> =
-    StorageMap<_, Blake2_128Concat, T::EraIndex, BoundedVec<(T::AccountId, u64), T::MaxRewards>, OptionQuery>;
+	#[pallet::storage]
+	#[pallet::getter(fn rewards)]
+	pub type ClaimedRewards<T: Config> = StorageDoubleMap<
+		_,
+		Blake2_128Concat,
+		EraIndex,
+		Blake2_128Concat,
+		T::AccountId,
+		BalanceOf<T>,
+		OptionQuery,
+	>;
 ```
 
 ## Extrinsic
@@ -191,20 +206,29 @@ interface {
   /// Creates a cluster
   /// Origin : Root
   /// A cluster can hold up to 5 enclaves
-  create_cluster(origin: OriginFor<T>)
+  create_cluster(origin: OriginFor<T>, cluster_type: ClusterType)
+
+  /// Updates a cluster type
+  /// Origin : Root
+  /// Cluster must not be empty
+  update_cluster(origin: OriginFor<T> cluster_id: ClusterId, cluster_type: ClusterType)
 
   /// Removes a cluster
   /// Origin : Root
   /// Cluster must be empty
   remove_cluster(origin: OriginFor<T> cluster_id: ClusterId)
 
+  /// Withdraw the unbonded amount
+  /// Origin: Operator address
+  withdraw_unbonded(origin: OriginFor<T>)
+
   /// Register metrics server
   /// Origin : Root
-  register_metrics_server(origin: OriginFor<T>, metrics_server_address: Account)
+  register_metrics_server(origin: OriginFor<T>, metrics_server: MetricsServer<T::AccountId>)
 
   /// Register submit report of metrics server
   /// Origin : Metric Server address
-  submit_metrics_server_report(origin: OriginFor<T>, report_params: ReportParams)
+  submit_metrics_server_report(origin: OriginFor<T>, era_index: Option<EraIndex>, operator_address: T::AccountId, metrics_server_report: MetricsServerReport<T::AccountId>)
 
   /// Claim rewards
   /// Origin : Operator address
@@ -213,6 +237,10 @@ interface {
   /// Set report parameters weightage
   /// Origin : Root
   set_report_params_weightage(origin: OriginFor<T>, report_params_weightage: ReportParamsWeightage)
+
+  /// Claim rewards by Era
+  /// Origin: Operator Address
+  claim_rewards(origin: OriginFor<T>, era: EraIndex)
 }
 ```
 ## Events
@@ -245,6 +273,23 @@ pub enum Event {
 		Unbonded { operator: T::AccountId, amount: BalanceOf<T> },
 		Withdrawn { operator: T::AccountId, amount: BalanceOf<T> },
 		MetricsServerAdded { metrics_server_address: T::AccountId },
+		/// Metrics server report submitted
+		MetricsServerReportSubmitted {
+			era: EraIndex,
+			operator_address: T::AccountId,
+			metrics_server_report: MetricsServerReport<T::AccountId>,
+		},
+		/// Report parameters weightage modified
+		ReportParamsWeightageModified {
+			param_1_weightage: u8,
+			param_2_weightage: u8,
+			param_3_weightage: u8,
+			param_4_weightage: u8,
+			param_5_weightage: u8,
+		},
+		/// Rewards claimed by operator
+		RewardsClaimed { era: EraIndex, operator_address: T::AccountId, amount: BalanceOf<T> },
+		
 
 }
 ```
@@ -274,6 +319,12 @@ pub enum Error {
 	WithdrawProhibited,
 	MetricsServerAlreadyExists,
 	MetricsServerLimitReached,
+	MetricsServerAddressNotFound,
+        EnclaveNotFoundForTheOperator,
+        FailedToGetActiveEra,
+        ReportAlreadySubmittedForEra,
+        MetricsReportsLimitReached,
+        InvalidEraToClaimRewards,
 }
 ```
 ## Side effects
