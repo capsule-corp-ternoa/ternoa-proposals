@@ -153,8 +153,7 @@ interface {
   ///     3. Quote
   ///     4. Enclave address & operator address
   /// One operator can have one enclave.
-  register_enclave_and_bond(origin: OriginFor<T>, enclave_address: Vec<u8>, api_uri: Vec<u8>, 
-  								payee: RewardDestination<T::AccountId>)
+  register_enclave_and_bond(origin: OriginFor<T>, enclave_address: Vec<u8>, api_uri: Vec<u8>)
 
   /// Removes an enclave from the system OR ask for removal if the enclave is assigned
   /// Origin : operator account address
@@ -213,6 +212,14 @@ interface {
   /// Cluster must not be empty
   update_cluster(origin: OriginFor<T> cluster_id: ClusterId, cluster_type: ClusterType)
 
+  /// Set Staking Amount
+  /// Origin : Root
+  set_staking_amount(origin: OriginFor<T>, staking_amount: BalanceOf<T>)
+
+  /// Set report parameters weightage
+  /// Origin : Root
+  set_report_params_weightage(origin: OriginFor<T>, report_params_weightage: ReportParamsWeightage)
+
   /// Removes a cluster
   /// Origin : Root
   /// Cluster must be empty
@@ -228,16 +235,7 @@ interface {
 
   /// Register submit report of metrics server
   /// Origin : Metric Server address
-  submit_metrics_server_report(origin: OriginFor<T>, era_index: Option<EraIndex>, operator_address: T::AccountId, metrics_server_report: MetricsServerReport<T::AccountId>)
-
-  /// Claim rewards
-  /// Origin : Operator address
-  claim_rewards(origin: OriginFor<T>)
-
-  /// Set report parameters weightage
-  /// Origin : Root
-  set_report_params_weightage(origin: OriginFor<T>, report_params_weightage: ReportParamsWeightage)
-
+  submit_metrics_server_report(origin: OriginFor<T>, era_index: Option<EraIndex>, operator_address: T::AccountId, metrics_server_report: 															MetricsServerReport<T::AccountId>)
   /// Claim rewards by Era
   /// Origin: Operator Address
   claim_rewards(origin: OriginFor<T>, era: EraIndex)
