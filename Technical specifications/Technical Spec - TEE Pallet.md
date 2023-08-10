@@ -235,7 +235,8 @@ interface {
 
   /// Register submit report of metrics server
   /// Origin : Metric Server address
-  submit_metrics_server_report(origin: OriginFor<T>, era_index: Option<EraIndex>, operator_address: T::AccountId, metrics_server_report: 															MetricsServerReport<T::AccountId>)
+  submit_metrics_server_report(origin: OriginFor<T>, era_index: Option<EraIndex>, operator_address: T::AccountId, metrics_server_report: MetricsServerReport<T::AccountId>)
+
   /// Claim rewards by Era
   /// Origin: Operator Address
   claim_rewards(origin: OriginFor<T>, era: EraIndex)
