@@ -4,7 +4,7 @@
 | ----------- | ----------- |
 | Created   | 8 Sep 2022       |
 | TIP Number   | TIP-500       |
-| Version   | v0.1       |
+| Version   | v0.2       |
 | Requires   | <Link to Basic NFT TIP here>       |
 | Status | In Progress       |
 | Category   | NFT       |
@@ -70,8 +70,41 @@ Proposal to register or remove a cluster requires approval from technical commit
 
 Each TEE can contain multiple enclaves, and each enclave has an operator. The operator can register the enclave to cluster or remove it. 
 
-Enclaves of a cluster essentially do not share any data between each other, however separate public clusters can p2p synchronize their corresponding slots to help network resilience.  
-  
+Enclaves which are members of a cluster essentially do not share any data between each other, however separate public clusters can peer-to-peer synchronize their corresponding "slots" to help network reliability.
+
+There are two types of clusters :
+ - Public cluster
+ - Enterprise cluster
+ 
+ Public clusters serve to Ternoa secret network unconditionally while enterprise clusters have constraints. The key difference is the Enclave Operator. Whenever the operators are controlled or assigned by a company or being limited by legal terms, their enclaves and clusters are considered as Enterprise. The famous example is the medical documnets that can not be stored on servers outside of a country. This case is a geographical limitation on enclave server location.
+
+&nbsp;
+### Cluster Synchronization
+- Definition of Enclave Slot (SSS)
+- Synchronization vs Backup
+- 
+
+&nbsp;
+#### Inter-Enclave Synchronization
+- 
+
+&nbsp;
+#### New Enclave Synchronization
+- Blockchain as source of trust (from genesis) 
+- Cluster as Source of Data
+
+&nbsp;
+#### Resuming Enclave Synchronization
+- Finding the last synchronized data
+- Search the blockchain
+- Fetch the data from clusters
+
+
+&nbsp;
+### Enterprise Synchroniation
+TBD
+
+
 &nbsp;
 ## Enclave Specifications
 
@@ -129,6 +162,36 @@ To do a Remote Attestation against an enclave, a valid quote is essential. Then 
 }
 
 ```
+
+
+&nbsp;
+### Cluster API
+
+&nbsp;
+* Request to synchronize with a slot
+
+```json
+//ENDPOINT:   https://alphanet-c1n1v2.ternoa.dev:8100/api/slot-sync/
+//METHOD:     POST
+//PARAMETER:  -
+//POST BODY:       
+            {
+                "requester_address": "Requester's account id of enclave in SS58 format",
+                "data": "<NFT ID>_<[List of NFTID]>_<Validity Interval>",
+                "signature": "SR25519 Signature of above 'data' field signed by 'requester'"
+            }
+
+//SAMPLE RESPONSE:   
+{
+    "status": "RETRIEVESUCCESS",
+    "nft_id": 110,
+    "enclave_id": "ALPHANET-C1N1E1",
+    "keyshare_data": "dBXjyUXHEk3Thuxy5tVD617nyD8xnUYSAUY7Dvoe",
+    "description": "TEE Key-share NFTRETRIEVE: Success retrieving nft_id key-share.",
+}
+
+```
+
 
 &nbsp;
 ### Secret-NFT API
