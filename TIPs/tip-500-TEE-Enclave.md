@@ -8,18 +8,21 @@
 | Requires   | <Link to Basic NFT TIP here>       |
 | Status | In Progress       |
 | Category   | NFT       |
-| Discussions-To   | https://github.com/capsule-corp-ternoa/ternoa-hub/discussions     |
+| Discussions-To   | <https://github.com/capsule-corp-ternoa/ternoa-hub/discussions>     |
 
 &nbsp;
+
 ## Simple Summary
-Hardware trusted execution environment (TEE) is the most practical solution for confidentiality and privacy problem in blockchains, comparing to cryptographic algorithms like ZKP, FHE and SMPC. This document provides a standard for interfacing offchain TEE with essential components of blockchain with a focus on secret content for NFTs. 
+
+Hardware trusted execution environment (TEE) is the most practical solution for confidentiality and privacy problem in blockchains, comparing to cryptographic algorithms like ZKP, FHE and SMPC. This document provides a standard for interfacing offchain TEE with essential components of blockchain with a focus on secret content for NFTs.
 
 &nbsp;
+
 ## Abstract
 
-The proposed architecture involves storage and retrieval of keys in a trusted execution environment (TEE) which is an offchain component associated with the secret NFT solution. TEE programs running on processors such as SGX provide strong trust guarantees in terms of data privacy and verification of the programs running within them. This can be achieved through techniques such as remote attestation that gives assurance that the program running inside the enclave is running on genuine TEE hardware (such as SGX), and the programs have not been modified by the TEE node operators. Data storage on TEEs are also secured by sealing them with the secure keys associated with the TEE hardware and/or author of the TEE programs. 
+The proposed architecture involves storage and retrieval of keys in a trusted execution environment (TEE) which is an offchain component associated with the secret NFT solution. TEE programs running on processors such as SGX provide strong trust guarantees in terms of data privacy and verification of the programs running within them. This can be achieved through techniques such as remote attestation that gives assurance that the program running inside the enclave is running on genuine TEE hardware (such as SGX), and the programs have not been modified by the TEE node operators. Data storage on TEEs are also secured by sealing them with the secure keys associated with the TEE hardware and/or author of the TEE programs.
 
-As an offchain extension of Key Management, Secure Computation and Confidential Storage for blockchains, there are at least five responsibilities of TEE : 
+As an offchain extension of Key Management, Secure Computation and Confidential Storage for blockchains, there are at least five responsibilities of TEE :
 
 - Using Remote Attestation mechanism to prove the genuinity of hardware and the codes running on it to be approved by blockchain validators and registered on the blockchain
 
@@ -32,8 +35,10 @@ As an offchain extension of Key Management, Secure Computation and Confidential 
 - Secure distributed backup and secure migration of secrets to other TEE machines
 
 &nbsp;
+
 ## Motivation
-TEE is a descendant of HSM and TPM, with an affordable cost and flexibility of executing general purpose applications rather than just cryptographic functions. 
+
+TEE is a descendant of HSM and TPM, with an affordable cost and flexibility of executing general purpose applications rather than just cryptographic functions.
 
 In spite of decades of scientific and technological efforts for securely outsourcing the computation tasks and storage to untrusted parties, we don't have any real-world feasible cryptographic protocol yet, and the available candidates need more decade of research and development. Hardware based security however has been the ultimate solution for critical areas of financial and military applications, in modern Android mobile devices, the TEE is already unknowingly used every day, by millions of people as an HSM equivalent, through the use of a Trusted Application (TA) providing the Android KeyMaster functionality. Recently there has been increasing attention to TEE as a source of trust for executing smart-contracts in blockchains.
 
@@ -42,19 +47,22 @@ While Basic NFTs merely represent ownership, Secure NFTs can further contain sen
 Leveraging TEEs to bring a confidentiality aspect to NFTs, enables a variety of different use cases across different segments to provide their services more efficiently and securely. With the help of Secure NFTs, blockchains can enable real-world services such as Digital Rights Management, Secret Markets and Access control.
 
 &nbsp;
+
 ## Threat Model
 
-Major goal is to ensure the confidentiality of user data hosted by an untrusted server node. We assume a strong adversary with privileged access to OS and storage, who can not only monitor the content of all server’s memory, disk and communication, but also actively tamper with it. However, the adversary cannot access enclaves provided by TEE. In particular, data and computation inside an enclave are protected with respect to the confidentiality and integrity. 
+Major goal is to ensure the confidentiality of user data hosted by an untrusted server node. We assume a strong adversary with privileged access to OS and storage, who can not only monitor the content of all server’s memory, disk and communication, but also actively tamper with it. However, the adversary cannot access enclaves provided by TEE. In particular, data and computation inside an enclave are protected with respect to the confidentiality and integrity.
 
-We exclude TEE side-channel attacks from our scope, since these vulnerabilities are implementation specific and we can adopt more secure TEEs when needed. 
-We do not consider the confidentiality of metadata and coarse statistical properties, such as the name of files and urls, and the length of values. In addition, we do not pursue strict indistinguishability of encrypted data and storage operations, since it usually leads to impractical performance penalty. Instead, we aim to provide operational data confidentiality where the information that the adversary learns is a function of data operations that have been performed. 
+We exclude TEE side-channel attacks from our scope, since these vulnerabilities are implementation specific and we can adopt more secure TEEs when needed.
+We do not consider the confidentiality of metadata and coarse statistical properties, such as the name of files and urls, and the length of values. In addition, we do not pursue strict indistinguishability of encrypted data and storage operations, since it usually leads to impractical performance penalty. Instead, we aim to provide operational data confidentiality where the information that the adversary learns is a function of data operations that have been performed.
 Since the adversary do not have the Data Encryption Key (DEK), it cannot perform arbitrary data operations of its choice.
 
 Note that other security guarantees, such as data integrity and protection from denial of service or TEE/Adversaries collusion, should be considered by designers. In fact, the complexity of additionally protecting data integrity also depends on the design choices.
 
 &nbsp;
+
 ## Threshold Scheme
-Despite being offchain entities, Enclaves are part of a blockchain ecosystem, so they should obey the rule of fault tolerability. No matter how secure are the Enclaves, there should not be a single point of failure in the whole system. 
+
+Despite being offchain entities, Enclaves are part of a blockchain ecosystem, so they should obey the rule of fault tolerability. No matter how secure are the Enclaves, there should not be a single point of failure in the whole system.
 
 Threshold cryptosystems protect information by encrypting and distributing secrets amongst a cluster of independent computers,so the system will be able to continue operating despite failures or malfunctions.
 
@@ -63,49 +71,58 @@ Since the general idea is to assume that the participating entities are suscepti
 With a minimum threshold, it can be ensured that even if some of the participants collude, the secret remains secure. In essence, this technique makes sure that a single individual doesn’t have the full authority, which can lead to vulnerability in the system. It also ensures that even if one or more individuals are unavailable, the secret can be unlocked and doesn’t cause bottlenecks.
 
 &nbsp;
+
 ## Cluster Network
-In Ternoa architecture, enclaves are organized in clusters to support secret sharing. Each cluster is made of 5 different enclaves. Enclaves of a cluster can either belong to a single private owner (for permissioned use) or be publicly distributed in different geographical locations or cloud providers. 
+
+In Ternoa architecture, enclaves are organized in clusters to support secret sharing. Each cluster is made of 5 different enclaves. Enclaves of a cluster can either belong to a single private owner (for permissioned use) or be publicly distributed in different geographical locations or cloud providers.
 
 Proposal to register or remove a cluster requires approval from technical committee of the Ternoa network, which is accessible from [polkadotjs](https://polkadot.js.org/apps/?rpc=wss://mainnet.ternoa.network/) app for everyone.
 
-Each TEE can contain multiple enclaves, and each enclave has an operator. The operator can register the enclave to cluster or remove it. 
+Each TEE can contain multiple enclaves, and each enclave has an operator. The operator can request to register the enclave to cluster or remove it.
 
-Enclaves which are members of a cluster essentially do not share any data between each other, however separate public clusters can peer-to-peer synchronize their corresponding "slots" to help network reliability.
+Enclaves which are members of a cluster essentially do not share any data between each other, however separate public clusters can peer-to-peer synchronize their corresponding "slots" to help the network reliability.
 
-There are two types of clusters :
- - Public cluster
- - Enterprise cluster
- 
+There are two types of general clusters :
+
+- Public cluster
+- Enterprise cluster
+
  Public clusters serve to Ternoa secret network unconditionally while enterprise clusters have constraints. The key difference is the Enclave Operator. Whenever the operators are controlled or assigned by a company or being limited by legal terms, their enclaves and clusters are considered as Enterprise. The famous example is the medical documnets that can not be stored on servers outside of a country. This case is a geographical limitation on enclave server location.
 
 &nbsp;
+
 ### Cluster Synchronization
+
 - Definition of Enclave Slot (SSS)
 - Synchronization vs Backup
-- 
 
 &nbsp;
+
 #### Inter-Enclave Synchronization
-- 
 
 &nbsp;
+
 #### New Enclave Synchronization
-- Blockchain as source of trust (from genesis) 
+
+- Blockchain as source of trust (from genesis)
 - Cluster as Source of Data
 
 &nbsp;
+
 #### Resuming Enclave Synchronization
+
 - Finding the last synchronized data
 - Search the blockchain
 - Fetch the data from clusters
 
-
 &nbsp;
+
 ### Enterprise Synchroniation
+
 TBD
 
-
 &nbsp;
+
 ## Enclave Specifications
 
 - Intel SGX
@@ -120,55 +137,67 @@ TBD
 ## [Enclave API](https://github.com/capsule-corp-ternoa/sgx_server/tree/master/client)
 
 &nbsp;
+
 ### General API
+
 &nbsp;
-* Health check
+
+- Health check
 
 &nbsp;
 Expresses the current status of enclave, as well as information about the identity of enclave, including an account address generated inside the enclave.
 If this API does not return anything or status is not 200, client should wait or use another enclave.
+&nbsp;
+
+- sync_state: shows the last blocknumber that enclave has synchronized its data with other enclaves in the same slot. If the field is empty then the enclave is not registered on blockchain yet.
 
 ```json
-// ENDPOINT:   https://alphanet-c1n1v2.ternoa.dev:8100/api/health
+// ENDPOINT:   https://[enclave-domain]:[port]/api/health
 // METHOD:     GET
 // BODY:       -
 // PARAMETER:  -
 //SAMPLE RESPONSE:  
 {
-    "status": 200,
-    "date": "2023-04-24 14:16:24",
-    "description": "SGX server is running!",
-    "enclave_id": "<Chain Name>-<Cluster Number><Node Number><Enclave Number>",
-    "enclave_address": "SS58 Account ID of Enclave which is registered on blockchain"
+    "chain": "mainnet",
+    "block_number": 7847947,
+    "sync_state": "[empty | setup | blocknumber]",
+    "enclave_address": "SS58 AccountId securly generated inside enclave",
+    "version": "0.4.4",
+    "description": "SGX server is running!"
 }
-
+    
 ```
 
 &nbsp;
-* Attestation Quote
+
+- Attestation Quote
   
 &nbsp;
-To do a Remote Attestation against an enclave, a valid quote is essential. Then quote will be sent to Intel API with additional parameters like SPID and Key to receive the Attestation Report. 
+To do a Remote Attestation against an enclave, a valid quote is essential. Then quote will be sent to Intel API with additional parameters like SPID and Key to receive the Attestation Report.
+
+&nbsp;
+The quote has timestamp and signed with enclave hardware key. In Ternoa protocol the vital part of quote (beside attestation) is user_data filed which enclave fills it with a signature of critical identity information (MRENCLAVE, BLOCKNUMBER, ACCOUNTID, ENCRYPTION_PUBLICKEY). The generated quote will guarantee the genuineness of both enclave and the Ternoa's code inside it.
 
 ```json
-//ENDPOINT:   https://alphanet-c1n1v2.ternoa.dev:8100/api/quote
+//ENDPOINT:   https://[enclave-domain]:[port]/api/quote
 //METHOD:     GET
 //BODY:       -
 //PARAMETER:  -
 //SAMPLE RESPONSE:   
 {
-    "status": "Success",
+    "block_number": 7402861,
     "data": "Hex string containing new quote and signature payload"
 }
 
 ```
 
-
 &nbsp;
+
 ### Cluster API
 
 &nbsp;
-* Request to synchronize with a slot
+
+- Request to synchronize with a slot
 
 ```json
 //ENDPOINT:   https://alphanet-c1n1v2.ternoa.dev:8100/api/slot-sync/
@@ -192,14 +221,16 @@ To do a Remote Attestation against an enclave, a valid quote is essential. Then 
 
 ```
 
-
 &nbsp;
+
 ### Secret-NFT API
-&nbsp;
-* Availability of a secret-nft on an enclave
 
 &nbsp;
-This endpoint is a short-cut to check if a specific nft-id is available onchain and its encryption key shares are stored on this enclave or not. Since this does not need signed payload is more efficient before requesting to retrieve the secrets. 
+
+- Availability of a secret-nft on an enclave
+
+&nbsp;
+This endpoint is a short-cut to check if a specific nft-id is available onchain and its encryption key shares are stored on this enclave or not. Since this does not need signed payload is more efficient before requesting to retrieve the secrets.
 
 ```json
 //ENDPOINT:   https://mainnet-tee-c1n1v1.ternoa.network:8100/api/secret-nft/is-keyshare-available/123654
@@ -215,9 +246,9 @@ This endpoint is a short-cut to check if a specific nft-id is available onchain 
 
 ```
 
-
 &nbsp;
-* View logs of secret-nft
+
+- View logs of secret-nft
 
 &nbsp;
 It is necessary in secret marketplace to know by which owners and how many times a secret-nft is opened. Using this API whole the history of the secret-nft can be traced back up the creation moment. It also shows capsule history if secret-nft is converted to capsule.
@@ -284,16 +315,17 @@ It is necessary in secret marketplace to know by which owners and how many times
 ```
 
 &nbsp;
-* <span style="color:white">Store secret to enclave</span>.
+
+- <span style="color:white">Store secret to enclave</span>.
 
 &nbsp;
-It is possible for someone to mint multiple secret-nft at the same time, however every minting request requires approval from owner that is not pleasant from user experience point of view. Thus dApp can implicitly create a secure temporary account named "signer" for current owner specially for current multiple-minting request. The Signer account should be approved by real owner to be able to sign the requests to enclave. Regarding this protocol, the store request will need five fields : 
+It is possible for someone to mint multiple secret-nft at the same time, however every minting request requires approval from owner that is not pleasant from user experience point of view. Thus dApp can implicitly create a secure temporary account named "signer" for current owner specially for current multiple-minting request. The Signer account should be approved by real owner to be able to sign the requests to enclave. Regarding this protocol, the store request will need five fields :
 
 - Owner address : Account ID of real Wallet/dApp owner who is minting the secret-nft. Enclave verifies the ownership of NFT-ID against this owner address.
   
 - Authentication token : This two part token is a suffix to important data fields before signing. Its presence is significant to prevent replay attack to Enclaves.
-    - Current Block Number : This proves that the request is not too old or for future
-    - Validity Interval : produce a margin around current block number. Maximum value of this field is 20 blocks.
+  - Current Block Number : This proves that the request is not too old or for future
+  - Validity Interval : produce a margin around current block number. Maximum value of this field is 20 blocks.
   
 - Signer address: Temporary account generated for signing the secrets on behalf of the owner. This field must be concatenated with a valid authentication token through an underscore.
 
@@ -304,7 +336,6 @@ It is possible for someone to mint multiple secret-nft at the same time, however
 - Signature : The signer account signs the Secret-Data to prove that this secret is owned by the owner of claimed NFT-ID.
 
 Enclaves only support SR25519 signatures.
-
 
 ```json
 //ENDPOINT:   https://alphanet-c1n1v2.ternoa.dev:8100/api/secret-nft/store-keyshare
@@ -328,20 +359,22 @@ Enclaves only support SR25519 signatures.
 }
 
 ```
-&nbsp;
-* <span style="color:white">Retrieve secret from enclave</span>.
 
 &nbsp;
-Retrieve means request a secret-share to reconstruct the decryption key of secret-NFT media. So Enclave has to make sure that requester has enough privilege to view the NFT content.   
 
-There are three persons who can view a secret : 
-* Current nft owner
-* Who has Rented the nft from current owner
-* Who has been delegated by current owner
+- <span style="color:white">Retrieve secret from enclave</span>.
 
-Enclaves needs to validate the requester with onchain data before letting her to view the secret. So requester must specify her privilege type specially if she is a Renter or Delegatee. 
+&nbsp;
+Retrieve means request a secret-share to reconstruct the decryption key of secret-NFT media. So Enclave has to make sure that requester has enough privilege to view the NFT content.
+
+There are three persons who can view a secret :
+
+- Current nft owner
+- Who has Rented the nft from current owner
+- Who has been delegated by current owner
+
+Enclaves needs to validate the requester with onchain data before letting her to view the secret. So requester must specify her privilege type specially if she is a Renter or Delegatee.
 The requested NFT-ID has to be concatenated with an Authentication Token which contains current block number and validity interval. Then requester has to sign the data string to prove the ownership of the account id and authenticity of the request.
-
 
 ```json
 //ENDPOINT:   https://alphanet-c1n1v2.ternoa.dev:8100/api/secret-nft/retrieve-keyshare
@@ -367,12 +400,14 @@ The requested NFT-ID has to be concatenated with an Authentication Token which c
 ```
 
 &nbsp;
-* <span style="color:white">Remove secret from enclave</span>.
+
+- <span style="color:white">Remove secret from enclave</span>.
 
 &nbsp;
 Anybody can request to remove the data for a NFT-ID. However Enclaves checks the blockchain if the NFT associated to the requested NFT-ID has been burnt already.
 
 &nbsp;
+
 ```json
 //ENDPOINT:   https://alphanet-c1n1v2.ternoa.dev:8100/api/secret-nft/remove-keyshare
 //METHOD:     POST
@@ -394,7 +429,9 @@ Anybody can request to remove the data for a NFT-ID. However Enclaves checks the
 ```
 
 &nbsp;
+
 ### Capsule API
+
 Capsule endpoints are exactly the same as Secret-NFT API, by replacing *secret-nft* to *capsule-nft* someone can communicate capsules secrets :
 
 ```json
@@ -443,26 +480,28 @@ Capsule Endpoints {
 }
 ````
 
-
 &nbsp;
 
 ---
 
 &nbsp;
+
 ### External Interfaces
-&nbsp;
-
-* [JS SDK Store Keyshare](https://github.com/capsule-corp-ternoa/ternoa-js/blob/3ed613d9c60c54d097f971975ba8cac66cee24ae/src/helpers/tee.ts#L234)
-* [JS SDK Retrieve Keyshare](https://github.com/capsule-corp-ternoa/ternoa-js/blob/3ed613d9c60c54d097f971975ba8cac66cee24ae/src/helpers/tee.ts#L317)
-&nbsp;
-* [Blockchain Interfaces (TEE-Pallet)](https://github.com/capsule-corp-ternoa/ternoa-proposals/blob/eb26b8c0aea2350b567b006a411051e53bedf320/TIPs/tip-510-TEE-Pallet.md#existing-interfaces-changed)
-&nbsp;
-
 
 &nbsp;
+
+- [JS SDK Store Keyshare](https://github.com/capsule-corp-ternoa/ternoa-js/blob/3ed613d9c60c54d097f971975ba8cac66cee24ae/src/helpers/tee.ts#L234)
+- [JS SDK Retrieve Keyshare](https://github.com/capsule-corp-ternoa/ternoa-js/blob/3ed613d9c60c54d097f971975ba8cac66cee24ae/src/helpers/tee.ts#L317)
+&nbsp;
+- [Blockchain Interfaces (TEE-Pallet)](https://github.com/capsule-corp-ternoa/ternoa-proposals/blob/eb26b8c0aea2350b567b006a411051e53bedf320/TIPs/tip-510-TEE-Pallet.md#existing-interfaces-changed)
+&nbsp;
+
+&nbsp;
+
 ## End-to-end workflow (Ternoa-specific)
 
 ### Store Secret
+
 To mint a secret-NFT or Change the key of a Capsule:
 
 - Client DApp encrypts NFT media with a Key.
@@ -474,6 +513,7 @@ To mint a secret-NFT or Change the key of a Capsule:
 - A log file will be generated on each enclave that logs any access or changes to that nft-id
 
 ### Retrieve Secret
+
 View a secret-NFT or Change Capsule media:
 
 - Client selects the cluster that contains corresponding key-shares.
@@ -483,6 +523,7 @@ View a secret-NFT or Change Capsule media:
 - Client uses the reconstructed key to decrypt the NFT/Capsule media.
 
 ### Remove Secret
+
 - Client asks enclave to remove a burnt nft
 - Enclave verifies the request
 - The remaining secrets and logs will be purged from enclave
@@ -495,23 +536,31 @@ View a secret-NFT or Change Capsule media:
 - Each share will be sent to a distinct enclave of the cluster.
 
 &nbsp;
+
 ## Constraints
+
 TBD
 
 &nbsp;
+
 ## Test cases
-- Wallet/SDK stores secret-share to an enclave 
-- Wallet/SDK changes secret-share on enclave 
+
+- Wallet/SDK stores secret-share to an enclave
+- Wallet/SDK changes secret-share on enclave
 - Wallet/SDK retrieves stored secret-share from enclave
 
 - Wallet/SDK stores secret-share to cluster with success reports
 - Wallet/SDK changes secret-share on cluster with success reports
 - Wallet/SDK retrieves stored secret-share from cluster
 
-&nbsp; 
+&nbsp;
+
 ## References
+
 TBD
 
 &nbsp;
+
 ## Copyright
+
 TBD
