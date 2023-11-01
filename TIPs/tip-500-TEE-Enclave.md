@@ -11,6 +11,7 @@
 | Discussions-To   | <[Discussion](https://github.com/capsule-corp-ternoa/ternoa-hub/discussions)>     |
 
 &nbsp;
+
 ## Simple Summary
 
 Hardware trusted execution environment (TEE) is the most practical solution for confidentiality and privacy problem in blockchains, comparing to cryptographic algorithms like ZKP, FHE and SMPC. This document provides a standard for interfacing offchain TEE with essential components of blockchain with a focus on secret content for NFTs.
@@ -46,6 +47,7 @@ While Basic NFTs merely represent ownership, Secret NFTs can further contain sen
 Leveraging TEEs to bring a confidentiality aspect to NFTs, enables a variety of different use cases across different segments to provide their services more efficiently and securely. With the help of Secure NFTs, blockchains can enable real-world services such as Digital Rights Management, Secret Markets and Access control.
 
 &nbsp;
+
 ## Threat Model
 
 Major goal is to ensure the confidentiality of user data hosted by an untrusted server node. We assume a strong adversary with privileged access to OS and storage, who can not only monitor the content of all server’s memory, disk and communication, but also actively tamper with it. However, the adversary cannot access enclaves provided by TEE. In particular, data and computation inside an enclave are protected with respect to the confidentiality and integrity.
@@ -92,11 +94,11 @@ There are two types of general clusters :
 ## Inter-Enclave Synchronization
 
 In order to create a decentralized fault-tolerant network of TEE enclaves, they should asynchronously communicate and replicate their confidential state.
-Whenever an enclave receives, stores and seals a secret-share, it will send a confirmation transaction to the blockchain. When the blockchain receives 5 different confirmations for the same NFT-ID from a cluster, the blockchain will generate a 'NFT-synced' event in the current block. Since all encalves in the network are listening to the blockchain events, as soon as they notice the 'NFT-synced' event, they send a request to the original cluster and corresponding slot number for the new secret-share(s).
+Whenever an enclave receives, stores and seals a secret-share, it will send a confirmation transaction to the blockchain. When the blockchain receives 5 different confirmations for the same NFT-ID from a cluster, the blockchain will generate a 'NFT-synced' event in the current block. Since all enclaves in the network are listening to the blockchain events, as soon as they notice the 'NFT-synced' event, they send a request to the original cluster and corresponding slot number for the new secret-share(s).
 
 ### Mutual Remote Attestation
 
-Communication channel of enclaves is secured by expirable tokens, confidential signatures and TLS standard. However the enclaves have to prove their genuineness in each secret exchange. That means they should prove that : they are running in a verifiable updated (cpu microcodes) hardware, they are running under a secured mechanism of TEE in terms of memory, processing and storage and finally they are running an updated official code of open-source Ternoa encalve.
+Communication channel of enclaves is secured by expirable tokens, confidential signatures and TLS standard. However the enclaves have to prove their genuineness in each secret exchange. That means they should prove that : they are running in a verifiable updated (cpu microcodes) hardware, they are running under a secured mechanism of TEE in terms of memory, processing and storage and finally they are running an updated official code of open-source Ternoa enclave.
 
 These are only possible through a hardware generated quote in TEE and then verifying it with the Intel as the manufacturer. To make the process bullet proof, we inject a signature of some confidential data to the quote before being signed by hardware key. These injected data will provide critical identity information to the other party that helps establishing the trust. Above all at the final stage, the data will be encrypted another time with a temporary public key which is generated securely inside the enclave.
 
@@ -114,7 +116,7 @@ Then enclave will be ready to receive new data or synchronize its data to other 
 
 ### Resuming Enclave Synchronization
 
-Encalve should persistently keep the track of their lastest sychronization state, to be able to recover after downtimes, either because of network connection problem or hardware maintenance, etc.
+Enclave should persistently keep the track of their lastest sychronization state, to be able to recover after downtimes, either because of network connection problem or hardware maintenance, etc.
 
 Resuming after downtime, enclaves get the current block-number from the blockchain, then start crawling the chain looking for minted secret-nft or capsules. Result of the crawling is a list of NFT-IDs which their secre-shares should be fetched using synchronization process we've described above.
 
@@ -155,12 +157,19 @@ If this API does not return anything or status is not 200, client should wait or
 - sync_state: shows the last blocknumber that enclave has synchronized its data with other enclaves in the same slot. If the field is empty then the enclave is not registered on blockchain yet.
 
 ```json
-// ENDPOINT:   https://[enclave-domain]:[port]/api/health
-// METHOD:     GET
-// BODY:       -
-// PARAMETER:  -
+//  ENDPOINT:   https://[enclave-domain]:[port]/api/health
+//  METHOD:     GET
+//  BODY:       -
+//  PARAMETER:  -
 
-//SAMPLE RESPONSE:  
+//  RESPONSE STATUS:
+ - OK
+ - PROCESSING       // Enclave is in maintenance mode
+ - PARTIAL_CONTENT  // Enclave is not registered, not synchronized
+ - RESET_CONTENT    // Enclave is in setup mode
+ - NOT_ACCEPTABLE   // Enclave is in unknown state
+
+//  SAMPLE RESPONSE BODY:  
 {
     "chain": "mainnet",
     "block_number": 7847947,
@@ -183,12 +192,16 @@ To do a Remote Attestation against an enclave, a valid quote is essential. Then 
 The quote has timestamp and is signed with enclave secret hardware key that can only be validated with Intel IAS endpoint. In Ternoa protocol an additional vital part of the quote is 64-bytes user_data field which enclave fills it with a signature of critical identity information(MRENCLAVE, BLOCKNUMBER, ACCOUNTID, ENCRYPTION_PUBLICKEY). This generated quote will guarantee the genuineness of both enclave and the Ternoa's source code inside it. More information about quote structure and report protocol is on [Intel attestation API documentation](https://api.trustedservices.intel.com/documents/sgx-attestation-api-spec.pdf).
 
 ```json
-//ENDPOINT:   https://[enclave-domain]:[port]/api/quote
-//METHOD:     GET
-//BODY:       -
-//PARAMETER:  -
+//  ENDPOINT:   https://[enclave-domain]:[port]/api/quote
+//  METHOD:     GET
+//  BODY:       -
+//  PARAMETER:  -
 
-//SAMPLE RESPONSE:   
+//  RESPONSE STATUS:
+ - OK
+ - INTERNAL_SERVER_ERROR    // Enclave Driver Error : Unable to write user_report_data or read from attestation/quote device
+ 
+//  SAMPLE RESPONSE BODY:
 {
     "block_number": 7402861,
     "data": "Hex encoded string containing new quote and signature payload"
@@ -211,12 +224,16 @@ This endpoint is a short-cut to check if a specific nft-id is available onchain 
 Response contains block_number field, If the keyshare of the requested nft-id is not available (e.g exists: false) then the block_number is the current chain blocknumber. If the result is positive (e.g exists: true) then block_number is the lastest blocknumber on which the secret keyshares of the specified nft-id are updated and synced. If the keyshare on this enclave of the nft-id is available and updated but the sync event has not been detected (one of the remaining four keyshares on other enclaves has not been updated), the block_number will be 0.
 
 ```json
-//ENDPOINT:   https://[enclave-domain]:[port]/api/secret-nft/is-keyshare-available/[nft-id]
-//METHOD:     GET
-//BODY:       -
-//PARAMETER:  nft-id (uint32)
+//  ENDPOINT:   https://[enclave-domain]:[port]/api/secret-nft/is-keyshare-available/[nft-id]
+//  METHOD:     GET
+//  BODY:       -
+//  PARAMETER:  nft-id (uint32)
 
-//SAMPLE RESPONSE:  
+//  RESPONSE STATUS:
+ - OK
+ - NOT_FOUND    // Keyshare for Secret-NFT of provided NFT-ID does not exist.
+ 
+//  SAMPLE RESPONSE BODY:  
 {
     "enclave_account": "5DDEgaWLgdrwCfJjy4B71bf54q5Gt14ffhumAkhmW4sK6Uox",
     "block_number": 7865927,
@@ -237,12 +254,19 @@ It is necessary in secrets marketplace for buyer to know by which owners and how
 Because of multi-cluster distribution of enclaves, one may store a keyshare to a cluster then update it on another cluster, thus following the update history can be a complex task if changes to keyshares are not done on the same cluster.
 
 ```json
-//ENDPOINT:   https://[enclave-domain]:[port]/api/secret-nft/get-views-log/[nft-id]
-//METHOD:     GET
-//BODY:       -
-//PARAMETER:  nft-id (uint32)
+//  ENDPOINT:   https://[enclave-domain]:[port]/api/secret-nft/get-views-log/[nft-id]
+//  METHOD:     GET
+//  BODY:       -
+//  PARAMETER:  nft-id (uint32)
 
-//SAMPLE RESPONSE:   
+//  RESPONSE STATUS:
+ - OK
+ - NOT_FOUND                // Secret-NFT of provided NFT-ID does not exist on-chain | corresponding log-file does not exist on this enclave
+ - NOT_ACCEPTABLE           // Provided NFT-ID exists but its type is not a Secret-NFT
+ - INTERNAL_SERVER_ERROR    // Enclave can not open or read the existing log-file
+ - UNPROCESSABLE_ENTITY     // Enclave can not deserialize the existing log-file
+
+//  SAMPLE RESPONSE BODY:
 {
     "enclave_account": "5DDEgaWLgdrwCfJjy4B71bf54q5Gt14ffhumAkhmW4sK6Uox",
     "nft_id": 343451,
@@ -269,7 +293,7 @@ Because of multi-cluster distribution of enclaves, one may store a keyshare to a
             .
             .
             .
-            // Removed Intentionally
+            //Removed Intentionally
             .
             .
             .
@@ -323,10 +347,10 @@ It is possible for someone to mint multiple secret-nft at the same time, however
 Enclaves only support SR25519 signatures.
 
 ```json
-//ENDPOINT:   https://[enclave-domain]:[port]/api/secret-nft/store-keyshare
-//METHOD:     POST
-//PARAMETER:  -
-//POST BODY:       
+//  ENDPOINT:   https://[enclave-domain]:[port]/api/secret-nft/store-keyshare
+//  METHOD:     POST
+//  PARAMETER:  -
+//  POST BODY:       
             {
                 "owner_address": "Owner's account id in SS58 format",
                 "signer_address": "<Signer account id>_<Current Block Number>_<Validity Interval>",
@@ -335,7 +359,13 @@ Enclaves only support SR25519 signatures.
                 "signature": " SR25519 Signature of above 'data' field signed by 'signer'  private key"
             }
 
-//SAMPLE RESPONSE:
+//  RESPONSE STATUS:
+ - OK
+ - CONFLICT                 // Keyshare of provided Secret-NFT ID already exists
+ - GATEWAY_TIMEOUT          // Can not send the confirmation transaction to the blockchain | Post-processing the transaction is failed
+ - INTERNAL_SERVER_ERROR    // Can not access the seal path | Can not create the file | Can not write the data to the disk
+
+//  SAMPLE RESPONSE BODY:
 {
     "status": "EXPIREDSIGNER",
     "enclave_account": "5DDEgaWLgdrwCfJjy4B71bf54q5Gt14ffhumAkhmW4sK6Uox",
@@ -362,10 +392,10 @@ Enclaves needs to validate the requester with onchain data before letting her to
 The requested NFT-ID has to be concatenated with an Authentication Token which contains current block number and validity interval. Then requester has to sign the data string to prove the ownership of the account id and authenticity of the request.
 
 ```json
-//ENDPOINT:   https://[enclave-domain]:[port]/api/secret-nft/retrieve-keyshare
-//METHOD:     POST
-//PARAMETER:  -
-//POST BODY:       
+//  ENDPOINT:   https://[enclave-domain]:[port]/api/secret-nft/retrieve-keyshare
+//  METHOD:     POST
+//  PARAMETER:  -
+//  POST BODY:       
             {
                 "requester_address": "Requester's account id in SS58 format",
                 "requester_type": "[OWNER | RENTEE | DELEGATEE]",
@@ -373,7 +403,12 @@ The requested NFT-ID has to be concatenated with an Authentication Token which c
                 "signature": "SR25519 Signature of above 'data' field signed by 'requester' private key"
             }
 
-//SAMPLE RESPONSE:   
+//  RESPONSE STATUS:
+ - OK
+ - NOT_FOUND                // Provided NFT-ID does not exist | Its type is not Secret-NFT | Its keyshare is not available on this enclave
+ - INTERNAL_SERVER_ERROR    // Can not open the keyshare file | Can not read the file
+
+//  SAMPLE RESPONSE BODY:
 {
     "status": "RETRIEVESUCCESS",
     "nft_id": 110,
@@ -394,16 +429,21 @@ Only METRICS server can request to remove the data for a NFT-ID. However Enclave
 &nbsp;
 
 ```json
-//ENDPOINT:   https://[enclave-domain]:[port]/api/secret-nft/remove-keyshare
-//METHOD:     POST
-//PARAMETER:  -
-//POST BODY:       
+//  ENDPOINT:   https://[enclave-domain]:[port]/api/secret-nft/remove-keyshare
+//  METHOD:     POST
+//  PARAMETER:  -
+//  POST BODY:       
             {
                 "requester_address": "5G1AGc....DrzFs",
                 "nft_id": 1336
             }
 
-//SAMPLE RESPONSE:   
+//  RESPONSE STATUS:
+ - OK
+ - BAD_REQUEST              // Request does not come from a valid Metric Server | Secret-NFT ID is not burnt | Keyshare is not available on this enclave
+ - INTERNAL_SERVER_ERROR    // Can not delete the file
+
+//  SAMPLE RESPONSE BODY:
 {
     "status": "REMOVESUCCESS",
     "nft_id": 1336,
@@ -421,18 +461,18 @@ Capsule endpoints are exactly the same as Secret-NFT API, by replacing *secret-n
 
 ```json
 Capsule Endpoints {
-    //METHOD:     GET
-    //BODY:       -
-    //PARAMETER:  nft-id (uint32)
+    //  METHOD:     GET
+    //  BODY:       -
+    //  PARAMETER:  nft-id (uint32)
     "Keyshare Availability" : "/api/capsule-nft/is-keyshare-available/<nftid>",
 
-    //METHOD:     GET
-    //BODY:       -
-    //PARAMETER:  nft-id (uint32)
+    //  METHOD:     GET
+    //  BODY:       -
+    //  PARAMETER:  nft-id (uint32)
     "Views Log" : "/api/capsule-nft/get-views-log/<nftid>",
 
-    //METHOD:     POST
-    //PARAMETER:  -
+    //  METHOD:     POST
+    //  PARAMETER:  -
     "Store Secret": "/api/capsule-nft/store-keyshare",
     "body":
             {
@@ -443,8 +483,8 @@ Capsule Endpoints {
                 "signature": " SR25519 Signature of above 'data' field signed by 'signer' "
             }
 
-    //METHOD:     POST
-    //PARAMETER:  -
+    //  METHOD:     POST
+    //  PARAMETER:  -
     "Retrieve Secret": "/api/capsule-nft/retrieve-keyshare",
     "body":       
             {
@@ -454,10 +494,10 @@ Capsule Endpoints {
                 "signature": "SR25519 Signature of above 'data' field signed by 'requester'"
             }
 
-    //METHOD:     POST
-    //PARAMETER:  -
+    //  METHOD:     POST
+    //  PARAMETER:  -
     "Remove Secret" : "/api/capsule-nft/remove-keyshare"
-    //POST BODY:       
+    //  POST BODY:       
             {
                 "requester_address": "5G1AGc....DrzFs",
                 "nft_id": 1336
@@ -474,17 +514,17 @@ Capsule Endpoints {
 - Request to synchronize with a slot
 
 ```json
-//ENDPOINT:   https://[enclave-domain]:[port]/api/slot-sync/
-//METHOD:     POST
-//PARAMETER:  -
-//POST BODY:       
+//  ENDPOINT:   https://[enclave-domain]:[port]/api/slot-sync/
+//  METHOD:     POST
+//  PARAMETER:  -
+//  POST BODY:       
             {
                 "requester_address": "SS58 format AccountId of the Requester",
                 "data": "<NFT ID>_<[List of NFTID]>_<Validity Interval>",
                 "signature": "SR25519 Signature of above 'data' field signed by the Requester private key"
             }
 
-//SAMPLE RESPONSE:   
+//  SAMPLE RESPONSE BODY:
 {
     "status": "RETRIEVESUCCESS",
     "nft_id": 110,
@@ -552,36 +592,6 @@ View a secret-NFT or Change Capsule media:
 
 &nbsp;
 
-- Client DApp encrypts NFT media with a Key.
-- The Encryption Key  will be split into 5 shares using Shamir's algorithm.
-- Client selects a cluster.
-- Each share will be sent to a distinct enclave of the cluster.
-- Enclave verifies the request, then
-- Secrets will be encrypted and stored on enclave machine.
-- A log file will be generated on each enclave that logs any access or changes to that nft-id
-
-### Retrieve Secret
-View a secret-NFT or Change Capsule media:
-
-- Client selects the cluster that contains corresponding key-shares.
-- Client asks every enclave to retrieve the secret of the specified nft-id.
-- Enclave verifies the request, then decrypts the secret and returns it to client.
-- When 3 of 5 enclaves return correct data, the original encryption key will be reconstructed in client wallet.
-- Client uses the reconstructed key to decrypt the NFT/Capsule media.
-
-### Remove Secret
-- Client asks enclave to remove a burnt nft
-- Enclave verifies the request
-- The remaining secrets and logs will be purged from enclave
-
-### P2P Synchronization
-
-- Client DApp encrypts NFT media with a Key.
-- The Encryption Key  will be split into 5 shares using Shamir's algorithm.
-- Client selects a cluster.
-- Each share will be sent to a distinct enclave of the cluster.
-
-&nbsp;
 ## Constraints
 
 TBD
@@ -605,6 +615,7 @@ TBD
 TBD
 
 &nbsp;
+
 ## Copyright
 
 TBD
