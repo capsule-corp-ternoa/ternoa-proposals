@@ -43,6 +43,9 @@ interface {
   /// Ask for registration of an enclave
   /// Origin : operator Account Address
   /// enclave_address :- Generated within each enclave (PK)
+  /// api_uri :- API URI of the enclave
+  /// value :- Token value that is being staked with the registration
+  /// payee :- Reward destination account ID
   /// Signed by operator (the origin)
   /// Notes:
   /// Enclave should have public endpoints to return:
@@ -51,13 +54,15 @@ interface {
   ///     3. Quote
   ///     4. Enclave address & operator address
   /// One operator can have one enclave.
-  register_enclave(origin: OriginFor<T>, enclave_address: Vec<u8>, api_uri: Vec<u8>)
+  register_enclave_and_bond(origin: OriginFor<T>, enclave_address: Vec<u8>, api_uri: Vec<u8>, 
+  				#[pallet::compact] value: BalanceOf<T>, payee: RewardDestination<T::AccountId>)
 
   /// Removes an enclave from the system OR ask for removal if the enclave is assigned
   /// Origin : operator account address
-  /// If the enclave is assigned, he will be placed in queue for tech committee approval
-  /// If the enclave is not already assigned, he can exit without permission.
-  unregister_enclave(origin: OriginFor<T>)
+  /// If the enclave is assigned, he will be placed in queue for tech committee approval and can 
+  /// withdraw the unbonded stake after the unbonding period.
+  /// If the enclave is not already assigned, he can exit without permission and can unbond immediately.
+  unregister_enclave_and_unbond(origin: OriginFor<T>)
   
   /// Ask for update of the enclave fields
   /// Origin : operator account address
@@ -105,6 +110,21 @@ interface {
   /// Origin : Root
   /// Cluster must be empty
   remove_cluster(origin: OriginFor<T> cluster_id: ClusterId)
+
+  /// Withdraws the unbonded amount after the unlocking period
+  withdraw_unbonded(origin: OriginFor<T>)
+
+  /// Register metrics server
+  /// Origin : Root
+  register_metrics_server(origin: OriginFor<T>, metrics_server_address: Account)
+
+  // Register submit report of metrics server
+  /// Origin : Metric Server address
+  submit_metrics_server_report(origin: OriginFor<T>, report_params: ReportParams)
+
+  /// Set metric server report params weightage
+  /// Origin : Root
+  set_metric_reports_param_weightage(origin: OriginFor<T>, report_params: ReportParamsWeightage)
 }
 ```
 
