@@ -147,17 +147,17 @@ NA
 * Asset class's owner can set metadata of asset class
 
 ### Issue:
-Sending gToken to a wallet without the minimum required amount of CAPS results in an error.
+Sending assets to a wallet without the minimum required amount of CAPS results in an error.
 
 #### Context:
-In the process of sending gToken, it's crucial to ensure that the recipient wallet holds at least 0.015 CAPS to receive the gToken. Without this minimum CAPS balance, the recipient wallet won't be able to accept the gToken.
+In the process of sending assets, it's crucial to ensure that the recipient wallet holds at least 0.015 CAPS to receive the assets. Without this minimum CAPS balance, the recipient wallet won't be able to accept the assets.
 
 #### Proposed Solution:
-1. Check if the recipient wallet has a sufficient CAPS balance before sending gToken.
-2. If the CAPS balance is insufficient, first send the necessary amount of CAPS to the recipient wallet, then proceed to send the gToken.
+1. Check if the recipient wallet has a sufficient CAPS balance before sending assets.
+2. If the CAPS balance is insufficient, first send the necessary amount of CAPS to the recipient wallet, then proceed to send the assets.
 
 #### Associated Risks:
-Sending gToken to wallets without a sufficient CAPS balance can lead to blockchain congestion and abuse issues. It's advisable to exercise caution when sending gToken and ensure that recipient wallets meet the minimum CAPS balance requirements.
+Sending assets to wallets without a sufficient CAPS balance can lead to blockchain congestion and abuse issues. It's advisable to exercise caution when sending assets and ensure that recipient wallets meet the minimum CAPS balance requirements.
 
 #### Minimum Required CAPS Amount:
 0.015 CAPS
